@@ -24,6 +24,11 @@ h1{font-size:20px;font-weight:500;margin:0 0 4px}
 .cpl{position:absolute;transform:translate(-50%,-50%);font-size:13px;font-weight:600;color:#444441;background:rgba(255,255,255,.8);border-radius:10px;width:20px;height:20px;line-height:20px;text-align:center}
 .cpl.n{color:#fff;background:#D85A30}
 .rl{position:absolute;transform:translate(-50%,-50%);font-size:12px;font-weight:500;color:#0F6E56;background:rgba(225,245,238,.85);border:1px solid #5DCAA5;border-radius:6px;padding:1px 6px;white-space:nowrap}
+#wrap.fs{position:fixed;inset:0;width:100vw;height:100vh;height:100dvh;min-height:0;z-index:1000;border-radius:0;border:none}
+.ovb{position:absolute;z-index:5;font:inherit;font-size:13px;padding:7px 11px;border-radius:8px;border:1px solid var(--bd2);background:var(--card);color:var(--tx);cursor:pointer;opacity:.92;touch-action:manipulation}
+#fsb{top:8px;right:8px}#fsm{top:8px;right:150px;display:none}#wrap.fs #fsm{display:block}
+#joy{position:absolute;width:110px;height:110px;margin:-55px 0 0 -55px;border-radius:50%;border:2px solid rgba(255,255,255,.7);background:rgba(44,44,42,.25);display:none;pointer-events:none;z-index:4}
+#joyk{position:absolute;left:35px;top:35px;width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.85)}
 #cap{font-size:12px;color:var(--tx2);padding:6px 0}
 #lg{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:2px 16px;font-size:13px;color:var(--tx2);padding:8px 0}
 #lg b{color:var(--tx);font-weight:500}
@@ -35,7 +40,7 @@ h2{font-size:15px;font-weight:500;margin:14px 0 2px}
 <h1>Первый этаж — 3D модель</h1>
 <p class="sub">Кухня детально, остальные комнаты по плану KRT 4. Размеры в сантиметрах, высота потолка 248.</p>
 <div class="vb" id="vb"></div>
-<div id="wrap"><div id="cv" tabindex="0"></div><div id="ov"></div></div>
+<div id="wrap"><div id="cv" tabindex="0"></div><div id="ov"></div><div id="joy"><div id="joyk"></div></div><button id="fsm" class="ovb">Изнутри</button><button id="fsb" class="ovb">⛶ На весь экран</button></div>
 <div id="cap"></div>
 <div class="vb" id="pad"></div>
 <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--tx2);padding:4px 0 8px"><label for="epw">Панель у лестницы (№32), ширина:</label><input id="epw" type="range" min="40" max="220" step="1" value="160" style="flex:1;max-width:320px"><span id="epwv" style="color:var(--tx);min-width:60px">160 см</span></div>
@@ -46,6 +51,13 @@ h2{font-size:15px;font-weight:500;margin:14px 0 2px}
 <button id="sfs" style="font:inherit;font-size:13px;padding:4px 10px;border-radius:8px;border:1px solid var(--bd2);background:var(--card);color:var(--tx);cursor:pointer">Оттоманка: у окна</button>
 </div>
 <div id="sfi" style="font-size:12px;color:var(--tx2);padding:0 0 8px"></div>
+<div style="display:flex;flex-wrap:wrap;align-items:center;gap:10px;font-size:13px;color:var(--tx2);padding:0 0 8px">
+<span>Телевизор (№30):</span>
+<label>диагональ <select id="tvd" style="font:inherit;font-size:13px;padding:3px 6px;border-radius:6px;border:1px solid var(--bd2);background:var(--card);color:var(--tx)"><option>65</option><option>75</option><option>77</option><option>83</option><option>85</option><option>98</option><option>100</option><option selected>115</option></select> "</label>
+<label>по стене (X) <input id="tvx" type="range" min="420" max="760" step="1" value="691"></label>
+<label>высота центра (Y) <input id="tvy" type="range" min="90" max="190" step="1" value="143"></label>
+</div>
+<div id="tvi" style="font-size:12px;color:var(--tx2);padding:0 0 8px"></div>
 <h2>Мебель и элементы</h2>
 <div id="lg"></div>
 </main>
@@ -396,11 +408,20 @@ led(G.VL,'L',0,85.1,577,31,0.1,140,LED,0.2);
 
 /* ---------- Гостиная: восточная стена ---------- */
 G.TV=new THREE.Group();scene.add(G.TV);
-(()=>{const zc=(530+852)/2,w=256.5,h=146.9,d=5.9,y0=70,x1=626;
- box(G.TV,x1-d,y0,zc-w/2,d,h,w,0x2C2C2A);
- const m=new THREE.Mesh(new THREE.PlaneGeometry(w-1.6,h-1.6),new THREE.MeshBasicMaterial({color:0x14181d}));
- m.rotation.y=-Math.PI/2;m.position.set(x1-d-0.05,y0+h/2,zc);G.TV.add(m);
- box(G.TV,x1,y0+h/2-35,zc-50,4,70,100,0x444441);
+const TVS={diag:115,zc:691,yc:70+146.9/2};
+G.TVS=new THREE.Group();G.TV.add(G.TVS);
+function tvDims(d){if(d===115)return{w:256.5,h:146.9,t:5.9};return{w:+(d*2.54*0.8716+2).toFixed(1),h:+(d*2.54*0.4903+2).toFixed(1),t:d>=85?6:4.5};}
+function buildTV(){
+  while(G.TVS.children.length)G.TVS.remove(G.TVS.children[0]);
+  const {w,h,t}=tvDims(TVS.diag),x1=626,zc=TVS.zc,y0=TVS.yc-h/2;
+  box(G.TVS,x1-t,y0,zc-w/2,t,h,w,0x2C2C2A);
+  const m=new THREE.Mesh(new THREE.PlaneGeometry(w-1.6,h-1.6),new THREE.MeshBasicMaterial({color:0x14181d}));
+  m.rotation.y=-Math.PI/2;m.position.set(x1-t-0.05,y0+h/2,zc);G.TVS.add(m);
+  const bw=Math.min(100,w*0.6),bh=Math.min(70,h*0.6);
+  box(G.TVS,x1,y0+h/2-bh/2,zc-bw/2,4,bh,bw,0x444441);
+}
+buildTV();
+(()=>{const zc=691,w=256.5;
  for(let i=0;i<5;i++)box(G.TV,629,24,zc-20+i*8,1,8,7.6,i===4?0xD3D1C7:0xF1EFE8);
  const cz0=420,CL=zc+w/2-420,n=4,sw=CL/n,W=0xE8E6DD;
  box(G.TV,595,25,cz0,35,1.5,CL,W);
@@ -575,15 +596,16 @@ G.HW=new THREE.Group();scene.add(G.HW);G.HL=new THREE.Group();G.HW.add(G.HL);
 (()=>{const BEI=0xE3DCCB,CUS=0xD9CBB0,X0=270;
  // скамья 120×40, сиденье на 48 см, низ парит
  const bz0=15,bz1=195,bx1=X0+40,cb=bz1-60;
- box(G.HW,X0,25,bz0,40,19,cb-bz0,BEI);
- box(G.HW,X0,25,cb,40,1.5,60,BEI);box(G.HW,X0,42.5,cb,40,1.5,60,BEI);box(G.HW,X0,25,bz1-1.5,40,19,1.5,BEI);
- box(G.HW,X0,25,cb,1.5,19,60,0xC9B99C);
+ box(G.HW,X0+3,0,bz0+3,34,4,bz1-bz0-6,DARK);
+ box(G.HW,X0,4,bz0,40,1.5,bz1-bz0,BEI);
+ box(G.HW,X0,23,bz0,38,1.5,59.25,BEI);
+ makeSwing(G.HW,'L',X0+40,4,38.5,bz0,59.25,true,0xEDE6D6,0,true);
+ box(G.HW,X0,42.5,bz0,40,1.5,bz1-bz0,BEI);
+ box(G.HW,X0,4,bz0,1.2,40,bz1-bz0,0xC9B99C);
+ [bz0,bz0+59.25,bz0+118.5,bz1-1.5].forEach(z=>box(G.HW,X0,4,z,40,40,1.5,BEI));
  box(G.HW,X0,44,bz0,41,6,bz1-bz0,0xEFE9DC);
- [[bz0,true],[bz0+60,false]].forEach(([z,hm])=>makeSwing(G.HW,'L',bx1,25,19,z,60,hm,0xEDE6D6,0,true));
  box(G.HW,X0+4,50,bz0+70,14,26,34,CUS);box(G.HW,X0+4,50,bz0+112,12,22,30,0xC9B99C);
- led(G.HL,'L',X0+5,24.4,bz0,32,0.6,bz1-bz0,LED);
- [[bz0+5,-1],[(bz0+bz1)/2,0],[bz1-5,1]].forEach(([z,e])=>{leg(G.HW,X0+5,z,0,e);leg(G.HW,X0+35,z,1,e);});
- led(G.HL,'L',X0,0.15,bz0,40,0.1,bz1-bz0,LED,0.25);
+ led(G.HL,'L',X0+34,42,bz0+1.5,3,0.5,bz1-bz0-3,LED);
  // дубовая панель с крючками и полка с подсветкой
  box(G.HW,X0,50,bz0,2,140,bz1-bz0,OAK);
  [30,62,94,126,158].forEach(z=>{box(G.HW,X0+2,158,bz0+z-15,6,1.5,1.5,0x2C2C2A);box(G.HW,X0+6.5,158,bz0+z-15,1.5,5,1.5,0x2C2C2A);});
@@ -635,12 +657,13 @@ function tri(a,b,c,col){
 
 /* ---------- Подписи ---------- */
 const LB=[[1,G.L,61,45,30],[2,G.L,61,45,118],[3,G.L,61,105,206],[4,G.L,61,105,273],[5,G.L,61,45,345],[6,G.L,61,45,415],[7,G.L,41,215,30],[8,G.L,41,215,74],[9,G.L,41,215,118],[10,G.L,41,215,162],[11,G.R,199,45,30],[12,G.R,199,45,90],[13,G.R,199,45,150],[14,G.R,199,105,210],[15,G.R,199,105,270],[16,G.R,219,215,30],[17,G.R,219,215,90],[18,G.R,219,215,150],[19,G.W,130,88,30],[20,G.L,30,88,358],[21,G.T,100,88,450],[22,G.L,32,150,438],[23,G.L,32,200,408],[24,G.V,6,120,562],[25,G.V,41,55,682],[26,G.V,6,120,792],[27,G.V,31,120,822],[28,G.V,32,150,660],[29,G.V,32,200,700],[30,G.TV,618,145,691],[31,G.TV,592,40,620],[32,G.EP,624,200,470],[33,G.SF,310,70,600],[34,G.CT,430,45,637],[35,G.WC,580,60,264],[36,G.WC,575,120,180],[37,G.WC,470,95,283],[38,G.WC,470,180,300],[39,G.WC,475,120,176],[40,G.GR,616,40,57],[41,G.GR,604,150,120],[42,G.GR,505,150,82],[43,G.GR,586,150,40],[44,G.HW,312,52,105],[45,G.HW,295,198,105],[46,G.HW,316,70,257],[47,G.HW,276,205,257]];
+const labsTV=()=>labs.find(l=>l.d.textContent==='30');
 const labs=LB.map(a=>{const d=document.createElement('div');d.className='nb';d.textContent=a[0];ov.appendChild(d);return{d,g:a[1],v:new THREE.Vector3(a[2],a[3],a[4]),k:'n'}});
 const ROOMS=[['Кухня 8,0 м²',130,2,170],['Прихожая 7,5 м²',345,2,200],['Гардероб',530,2,63],['WC 3,4 м²',530,2,218],['Гостиная 34,7 м²',330,2,690],['Лестница',530,2,420]];
 [['С','N'],['В','E'],['Ю','S'],['З','W']].forEach(([t,k])=>{const d=document.createElement('div');d.className='cpl'+(k==='N'?' n':'');d.textContent=t;ov.appendChild(d);
   labs.push({d,g:G.CP,v:new THREE.Vector3(CPC.x+DIRS[k][0]*(CPR+16),1,CPC.z+DIRS[k][1]*(CPR+16)),k:'r'});});
 ROOMS.forEach(r=>{const d=document.createElement('div');d.className='rl';d.textContent=r[0];ov.appendChild(d);labs.push({d,g:G.F,v:new THREE.Vector3(r[1],r[2],r[3]),k:'r'});});
-const LGT=['Открытый ящик 60, полка','Шкаф 116: плита, 3 ящика','Пенал 60: помойка, духовка, противни над ней, 2 полки','Пенал 29×74: химия / для выпечки / запасы','Шкаф 70, 2 ящика','Шкаф 70: полка и ящик','Навесной 60, 2 отсека','Навесной 28, 2 отсека','Навесной 60: вытяжка, сплошная дверь','Навесной 28, 2 отсека','Открытый ящик 60, полка','Посудомойка 60','Мойка 60, дверь, без полки (измельчитель, фильтр)','Морозилка 182 + шкаф над ней','Холодильник 182 + шкаф над ним','Навесной 60, 2 отсека','Навесной 60, 2 отсека','Навесной 60: сушилка, полка, дверь','Стол у окна 140×60','Столешница 95','Стол 90×185, ножка 20 (отступ 45)','Полка 140×31 с подсветкой','Полка 110×31 с подсветкой','Гостиная: декор-панель 50 (брусья)','Гостиная: комод 190×40×60 на ножках 25, 4 двери (push-to-open), 1 полка','Гостиная: декор-панель 30 (брусья, кабель)','Гостиная: каркасная полка 30×30 до потолка, LED на каждой полке','Гостиная: полка 140×31 с подсветкой','Гостиная: полка 110×31 с подсветкой','Гостиная: ТВ LG 115" QNED на стене, 256,5×146,9 см','Гостиная: ТВ-тумба ≈399×35×30 на ножках 25, 4 откидных фасада, скрывает розетки','Гостиная: декор-панель из брусьев у лестницы, ширина регулируется','Гостиная: угловой диван 300 см с оттоманкой, 2 подлокотника','Гостиная: журнальный столик 140×60×37 (дуб)','WC: подвесной унитаз на инсталляции 78×21 до потолка','WC: душ 91,5×108,5, поддон из плитки, угловые двери','WC: раковина 59×40, тумба с 2 ящиками','WC: зеркало 50×70 со скруглёнными углами и подсветкой','WC: шкаф 90×40 до потолка: швабры и пылесос внизу, полки для полотенец сверху','Гардероб: короб гребёнок тёплого пола 115×11×57','Гардероб: щитки слаботочки (верх) и электропитания (низ)','Гардероб: модули у стены WC, глубина 42: колонна полок 40 + 2 секции со штангой и обувью','Гардероб: модуль на всю восточную стену 127: штанга, корзина, полка над гребёнками','Прихожая: скамья 180×40 на ножках 25, 2 дверцы + ниша для обуви, подсветка снизу','Прихожая: дубовая панель 180 с 5 крючками и полка с подсветкой','Прихожая: тумба 95×40 на ножках 25, 2 ящика','Прихожая: рейки до потолка и круглое зеркало Ø75 с подсветкой'];
+const LGT=['Открытый ящик 60, полка','Шкаф 116: плита, 3 ящика','Пенал 60: помойка, духовка, противни над ней, 2 полки','Пенал 29×74: химия / для выпечки / запасы','Шкаф 70, 2 ящика','Шкаф 70: полка и ящик','Навесной 60, 2 отсека','Навесной 28, 2 отсека','Навесной 60: вытяжка, сплошная дверь','Навесной 28, 2 отсека','Открытый ящик 60, полка','Посудомойка 60','Мойка 60, дверь, без полки (измельчитель, фильтр)','Морозилка 182 + шкаф над ней','Холодильник 182 + шкаф над ним','Навесной 60, 2 отсека','Навесной 60, 2 отсека','Навесной 60: сушилка, полка, дверь','Стол у окна 140×60','Столешница 95','Стол 90×185, ножка 20 (отступ 45)','Полка 140×31 с подсветкой','Полка 110×31 с подсветкой','Гостиная: декор-панель 50 (брусья)','Гостиная: комод 190×40×60 на ножках 25, 4 двери (push-to-open), 1 полка','Гостиная: декор-панель 30 (брусья, кабель)','Гостиная: каркасная полка 30×30 до потолка, LED на каждой полке','Гостиная: полка 140×31 с подсветкой','Гостиная: полка 110×31 с подсветкой','Гостиная: ТВ на стене (диагональ и положение меняются ползунками)','Гостиная: ТВ-тумба ≈399×35×30 на ножках 25, 4 откидных фасада, скрывает розетки','Гостиная: декор-панель из брусьев у лестницы, ширина регулируется','Гостиная: угловой диван 300 см с оттоманкой, 2 подлокотника','Гостиная: журнальный столик 140×60×37 (дуб)','WC: подвесной унитаз на инсталляции 78×21 до потолка','WC: душ 91,5×108,5, поддон из плитки, угловые двери','WC: раковина 59×40, тумба с 2 ящиками','WC: зеркало 50×70 со скруглёнными углами и подсветкой','WC: шкаф 90×40 до потолка: швабры и пылесос внизу, полки для полотенец сверху','Гардероб: короб гребёнок тёплого пола 115×11×57','Гардероб: щитки слаботочки (верх) и электропитания (низ)','Гардероб: модули у стены WC, глубина 42: колонна полок 40 + 2 секции со штангой и обувью','Гардероб: модуль на всю восточную стену 127: штанга, корзина, полка над гребёнками','Прихожая: скамья 180×40 на полу, сиденье 50: у двери отсек с полкой и дверцей, 2 открытых отсека во всю высоту','Прихожая: дубовая панель 180 с 5 крючками и полка с подсветкой','Прихожая: тумба 95×40 на ножках 25, 2 ящика','Прихожая: рейки до потолка и круглое зеркало Ø75 с подсветкой'];
 document.getElementById('lg').innerHTML=LGT.map((t,i)=>'<div><b>'+(i+1)+'</b> '+t+'</div>').join('');
 
 /* ---------- Человечек ---------- */
@@ -671,7 +694,7 @@ Object.values(POSE).forEach(g=>MAN_G.add(g));
 /* ---------- Камеры и управление ---------- */
 const cap={
  d3:'Вращение: тянуть. Приближение: колесо или щипок. Сдвиг: стрелки, кнопки ниже или правая кнопка мыши. Shift+стрелки: выше или ниже. Оранжевый человечек показывает, где вы стоите в режиме «Изнутри». Клик по двери или ящику открывает его.',
- fp:'Щёлкните по модели, затем: W A S D — идти, левая кнопка мыши — осмотреться, клик по двери или ящику — открыть / закрыть, Shift — присесть / встать, C — лечь / встать, колесо мыши или щипок — камера дальше от головы или ближе (до вида из глаз).',
+ fp:'На телефоне: левая часть экрана — джойстик (тяните вверх — идти вперёд), правая — осмотреться. На компьютере щёлкните по модели, затем: W A S D — идти, левая кнопка мыши — осмотреться, клик по двери или ящику — открыть / закрыть, Shift — присесть / встать, C — лечь / встать, колесо мыши или щипок — камера дальше от головы или ближе (до вида из глаз).',
  l:'Кухня, левая стена, окно справа.',r:'Кухня, правая стена, окно слева.',w:'Кухня, стена с окном, вид от входа.'};
 const pc=new THREE.PerspectiveCamera(32,W0/H0,5,8000);
 const fc=new THREE.PerspectiveCamera(75,W0/H0,1,8000);
@@ -759,7 +782,7 @@ function pan(r,f,u){
   C3.x+=rx*r+fx*f;C3.z+=rz*r+fz*f;C3.y+=u;clampC();draw();
 }
 /* --- движение WASD --- */
-const keys=new Set();let raf=0,last=0;
+const keys=new Set();let raf=0,last=0,joy=null;
 function setStance(s){stance=(stance===s)?'stand':s;syncPad();kick();}
 function kick(){if(!raf){last=performance.now();raf=requestAnimationFrame(tick);}}
 function tick(t){
@@ -769,9 +792,10 @@ function tick(t){
   if(keys.has('KeyS')||keys.has('ArrowDown'))f-=1;
   if(keys.has('KeyD')||keys.has('ArrowRight'))r+=1;
   if(keys.has('KeyA')||keys.has('ArrowLeft'))r-=1;
+  if(joy){f+=clamp(-joy.dy/50,-1,1);r+=clamp(joy.dx/50,-1,1);}
   let moving=false;
   if(mode==='fp'&&(f||r)){
-    const n=Math.hypot(f,r),v=SPEED[stance]*dt/n;
+    const n=Math.max(1,Math.hypot(f,r)),v=SPEED[stance]*dt/n;
     const rx=Math.cos(yaw),rz=Math.sin(yaw),fx=Math.sin(yaw),fz=-Math.cos(yaw);
     E.x+=(rx*r+fx*f)*v;E.z+=(rz*r+fz*f)*v;clampE();moving=true;
   }
@@ -779,7 +803,7 @@ function tick(t){
   if(Math.abs(dy)>0.3){E.y+=dy*Math.min(1,dt*10);settling=true;}else E.y=ty;
   const an=stepMovs(dt);
   draw();
-  if(moving||settling||an||keys.size)raf=requestAnimationFrame(tick);else raf=0;
+  if(moving||settling||an||keys.size||joy)raf=requestAnimationFrame(tick);else raf=0;
 }
 cv.addEventListener('keydown',e=>{
   if(mode==='fp'){
@@ -832,7 +856,12 @@ cv.addEventListener('wheel',e=>{
   else if(mode==='fp'){e.preventDefault();tpd=clamp(tpd+e.deltaY*0.4,0,400);if(tpd<10&&e.deltaY<0)tpd=0;draw();}
 },{passive:false});
 const pts=new Map();let pinch=0,mid=null;
-cv.addEventListener('pointerdown',e=>{cv.focus({preventScroll:true});if(e.pointerType==='mouse'){for(const [id,q] of pts)if(q.pt==='mouse')pts.delete(id);}pts.set(e.pointerId,{x:e.clientX,y:e.clientY,sx:e.clientX,sy:e.clientY,t0:performance.now(),b:e.button,sh:e.shiftKey,pt:e.pointerType});cv.setPointerCapture(e.pointerId);if(pts.size===2){const a=[...pts.values()];pinch=Math.hypot(a[0].x-a[1].x,a[0].y-a[1].y);mid={x:(a[0].x+a[1].x)/2,y:(a[0].y+a[1].y)/2};}});
+const joyEl=document.getElementById('joy'),joyK=document.getElementById('joyk');
+cv.addEventListener('pointerdown',e=>{
+  if(mode==='fp'&&e.pointerType!=='mouse'&&!joy){const r=cv.getBoundingClientRect();if(e.clientX-r.left<r.width*0.4){
+    joy={id:e.pointerId,sx:e.clientX,sy:e.clientY,dx:0,dy:0};cv.setPointerCapture(e.pointerId);
+    joyEl.style.left=(e.clientX-r.left)+'px';joyEl.style.top=(e.clientY-r.top)+'px';joyEl.style.display='block';joyK.style.transform='translate(0,0)';kick();return;}}
+  cv.focus({preventScroll:true});if(e.pointerType==='mouse'){for(const [id,q] of pts)if(q.pt==='mouse')pts.delete(id);}pts.set(e.pointerId,{x:e.clientX,y:e.clientY,sx:e.clientX,sy:e.clientY,t0:performance.now(),b:e.button,sh:e.shiftKey,pt:e.pointerType});cv.setPointerCapture(e.pointerId);if(pts.size===2){const a=[...pts.values()];pinch=Math.hypot(a[0].x-a[1].x,a[0].y-a[1].y);mid={x:(a[0].x+a[1].x)/2,y:(a[0].y+a[1].y)/2};}});
 const ray=new THREE.Raycaster();
 function visChain(o){while(o){if(!o.visible)return false;o=o.parent;}return true;}
 function pick(e){
@@ -850,13 +879,16 @@ function pick(e){
     return;
   }
 }
+function joyEnd(e){if(joy&&e.pointerId===joy.id){joy=null;joyEl.style.display='none';return true;}return false;}
 cv.addEventListener('pointerup',e=>{
+  if(joyEnd(e))return;
   const p=pts.get(e.pointerId);
   try{if(p&&pts.size===1&&(mode==='fp'||mode==='d3')&&p.b===0&&Math.hypot(e.clientX-p.sx,e.clientY-p.sy)<6&&performance.now()-p.t0<500)pick(e);}
   finally{pts.delete(e.pointerId);pinch=0;mid=null;}});
-cv.addEventListener('lostpointercapture',e=>{pts.delete(e.pointerId);pinch=0;mid=null;});
-cv.addEventListener('pointercancel',e=>{pts.delete(e.pointerId);pinch=0;mid=null;});
+cv.addEventListener('lostpointercapture',e=>{if(joyEnd(e))return;pts.delete(e.pointerId);pinch=0;mid=null;});
+cv.addEventListener('pointercancel',e=>{if(joyEnd(e))return;pts.delete(e.pointerId);pinch=0;mid=null;});
 cv.addEventListener('pointermove',e=>{
+  if(joy&&e.pointerId===joy.id){let dx=e.clientX-joy.sx,dy=e.clientY-joy.sy;const L=Math.hypot(dx,dy);if(L>50){dx*=50/L;dy*=50/L;}joy.dx=dx;joy.dy=dy;joyK.style.transform='translate('+dx+'px,'+dy+'px)';return;}
   if(!pts.has(e.pointerId)||(mode!=='d3'&&mode!=='fp'))return;
   const p=pts.get(e.pointerId);
   const k=mode==='fp'?0.3:rad*0.0011;
@@ -876,13 +908,27 @@ cv.addEventListener('pointermove',e=>{
 });
 function resize(){W0=el.clientWidth;H0=el.clientHeight;ren.setSize(W0,H0);pc.aspect=fc.aspect=W0/H0;pc.updateProjectionMatrix();fc.updateProjectionMatrix();setView(mode);}
 window.addEventListener('resize',resize);
+const wrapEl=document.getElementById('wrap'),fsb=document.getElementById('fsb'),fsm=document.getElementById('fsm');
+function fsSync(){const on=wrapEl.classList.contains('fs');fsb.textContent=on?'✕ Выйти':'⛶ На весь экран';fsm.textContent=mode==='fp'?'3D':'Изнутри';setTimeout(resize,60);}
+fsb.addEventListener('click',()=>{
+  const on=wrapEl.classList.contains('fs');
+  if(on){wrapEl.classList.remove('fs');try{if(document.fullscreenElement)document.exitFullscreen();else if(document.webkitFullscreenElement)document.webkitExitFullscreen();}catch(_){}fsSync();return;}
+  wrapEl.classList.add('fs');
+  try{const r=wrapEl.requestFullscreen?wrapEl.requestFullscreen():wrapEl.webkitRequestFullscreen?wrapEl.webkitRequestFullscreen():null;if(r&&r.catch)r.catch(()=>{});}catch(_){}
+  fsSync();
+});
+const fsChange=()=>{if(!document.fullscreenElement&&!document.webkitFullscreenElement&&wrapEl.classList.contains('fs')&&fsWasNative){wrapEl.classList.remove('fs');}fsWasNative=!!(document.fullscreenElement||document.webkitFullscreenElement);fsSync();};
+let fsWasNative=false;
+document.addEventListener('fullscreenchange',fsChange);document.addEventListener('webkitfullscreenchange',fsChange);
+fsm.addEventListener('click',()=>{setView(mode==='fp'?'d3':'fp');fsSync();});
 const epIn=document.getElementById('epw'),epV=document.getElementById('epwv');
-epIn.addEventListener('input',()=>{epW=+epIn.value;epV.textContent=epW+' см'+(epW>173?' (заходит за ТВ на '+(epW-173)+' см)':' (до ТВ '+(173-epW)+' см)');buildEP();draw();});
-epV.textContent='160 см (до ТВ 13 см)';
+function epText(){const edge=TVS.zc-tvDims(TVS.diag).w/2,gap=Math.round(edge-(390+epW));epV.textContent=epW+' см'+(gap<0?' (заходит за ТВ на '+(-gap)+' см)':' (до ТВ '+gap+' см)');}
+epIn.addEventListener('input',()=>{epW=+epIn.value;epText();buildEP();draw();});
+epText();
 const sfx=document.getElementById('sfx'),sfz=document.getElementById('sfz'),sfs=document.getElementById('sfs'),sfi=document.getElementById('sfi');
 function sofaInfo(){
   const {xb,zs,len,dep,chL,side}=SOFA,ze=zs+len;
-  const eye=xb+25,dist=Math.round(620-eye);
+  const eye=xb+25,dist=Math.round(620-eye),dg=TVS.diag*2.54;
   const pass=Math.round(xb-40);
   const chZ0=side==='S'?ze-100:zs,chZ1=chZ0+100;
   const dd=(hx,hz,px,pz)=>Math.hypot(px-hx,pz-hz);
@@ -890,12 +936,25 @@ function sofaInfo(){
   const doorL=Math.round(nearL-87);
   const tableGap=Math.round(Math.hypot(Math.max(0,xb-185),Math.max(0,zs-495)));
   const toConsole=Math.round(595-(xb+chL));
-  sfi.textContent='До экрана от глаз ≈ '+dist+' см ('+(dist/292).toFixed(2)+' × диагональ) · проход у комода '+pass+' см · до угла стола '+tableGap+' см · запас до двери на террасу '+doorL+' см · от оттоманки до ТВ-тумбы '+toConsole+' см';
+  sfi.textContent='До экрана от глаз ≈ '+dist+' см ('+(dist/dg).toFixed(2)+' × диагональ) · проход у комода '+pass+' см · до угла стола '+tableGap+' см · запас до двери на террасу '+doorL+' см · от оттоманки до ТВ-тумбы '+toConsole+' см';
 }
 sfx.addEventListener('input',()=>{SOFA.xb=+sfx.value;document.getElementById('sfxv').textContent=sfx.value;buildSofa();sofaInfo();draw();});
 sfz.addEventListener('input',()=>{SOFA.zs=+sfz.value;document.getElementById('sfzv').textContent=sfz.value;buildSofa();sofaInfo();draw();});
 sfs.addEventListener('click',()=>{SOFA.side=SOFA.side==='S'?'N':'S';sfs.textContent='Оттоманка: '+(SOFA.side==='S'?'у окна':'у кухни');buildSofa();sofaInfo();draw();});
 sofaInfo();
+const tvd=document.getElementById('tvd'),tvx=document.getElementById('tvx'),tvy=document.getElementById('tvy'),tvi=document.getElementById('tvi');
+function tvUpdate(){
+  TVS.diag=+tvd.value;const {w,h}=tvDims(TVS.diag);
+  TVS.zc=clamp(+tvx.value,310+w/2,852-w/2);
+  TVS.yc=clamp(+tvy.value,h/2+56,CEIL-h/2-2);
+  buildTV();const l=labsTV();if(l)l.v.set(618,TVS.yc,TVS.zc);
+  const bot=Math.round(TVS.yc-h/2),top=Math.round(TVS.yc+h/2),gap=bot-55;
+  const mid=Math.round(TVS.zc-691);
+  tvi.textContent=TVS.diag+'" ≈ '+w+'×'+h+' см · низ '+bot+' см, верх '+top+' см · над тумбой '+gap+' см · '+(mid===0?'по центру между лестницей и шторами':(mid>0?'смещён к шторам на '+mid+' см':'смещён к лестнице на '+(-mid)+' см'));
+  epText();sofaInfo();draw();
+}
+[tvd,tvx,tvy].forEach(e=>e.addEventListener('input',tvUpdate));tvd.addEventListener('change',tvUpdate);
+tvUpdate();
 buildWalls();
 setView('d3');
 </script>
