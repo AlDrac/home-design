@@ -29,6 +29,10 @@ h1{font-size:20px;font-weight:500;margin:0 0 4px}
 #fsb{top:8px;right:8px}#fsm{top:8px;right:150px;display:none}#wrap.fs #fsm{display:block}
 #joy{position:absolute;width:110px;height:110px;margin:-55px 0 0 -55px;border-radius:50%;border:2px solid rgba(255,255,255,.7);background:rgba(44,44,42,.25);display:none;pointer-events:none;z-index:4}
 #joyk{position:absolute;left:35px;top:35px;width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.85)}
+.dl{position:absolute;transform:translate(-50%,-100%);font-size:10.5px;font-weight:500;color:#A32D2D;background:rgba(252,235,235,.88);border:1px solid #F09595;border-radius:4px;padding:0 4px;white-space:nowrap;pointer-events:none}
+.rul{position:absolute;transform:translate(-50%,-130%);font-size:13px;font-weight:600;color:#fff;background:#185FA5;border-radius:6px;padding:2px 7px;white-space:nowrap;pointer-events:none;display:none}
+#engb{top:8px;left:8px}#rulb{top:8px;left:150px;display:none}
+.ovb.on{background:#FCEBEB;border-color:#E24B4A;color:#A32D2D}
 #cap{font-size:12px;color:var(--tx2);padding:6px 0}
 #lg{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:2px 16px;font-size:13px;color:var(--tx2);padding:8px 0}
 #lg b{color:var(--tx);font-weight:500}
@@ -40,7 +44,7 @@ h2{font-size:15px;font-weight:500;margin:14px 0 2px}
 <h1>Первый этаж — 3D модель</h1>
 <p class="sub">Кухня детально, остальные комнаты по плану KRT 4. Размеры в сантиметрах, высота потолка 248.</p>
 <div class="vb" id="vb"></div>
-<div id="wrap"><div id="cv" tabindex="0"></div><div id="ov"></div><div id="joy"><div id="joyk"></div></div><button id="fsm" class="ovb">Изнутри</button><button id="fsb" class="ovb">⛶ На весь экран</button></div>
+<div id="wrap"><div id="cv" tabindex="0"></div><div id="ov"></div><div id="joy"><div id="joyk"></div></div><button id="engb" class="ovb">📐 Инженерный режим</button><button id="rulb" class="ovb">📏 Рулетка</button><button id="fsm" class="ovb">Изнутри</button><button id="fsb" class="ovb">⛶ На весь экран</button></div>
 <div id="cap"></div>
 <div class="vb" id="pad"></div>
 <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--tx2);padding:4px 0 8px"><label for="epw">Панель у лестницы (№32), ширина:</label><input id="epw" type="range" min="40" max="220" step="1" value="160" style="flex:1;max-width:320px"><span id="epwv" style="color:var(--tx);min-width:60px">160 см</span></div>
@@ -662,7 +666,8 @@ const labs=LB.map(a=>{const d=document.createElement('div');d.className='nb';d.t
 const ROOMS=[['Кухня 8,0 м²',130,2,170],['Прихожая 7,5 м²',345,2,200],['Гардероб',530,2,63],['WC 3,4 м²',530,2,218],['Гостиная 34,7 м²',330,2,690],['Лестница',530,2,420]];
 [['С','N'],['В','E'],['Ю','S'],['З','W']].forEach(([t,k])=>{const d=document.createElement('div');d.className='cpl'+(k==='N'?' n':'');d.textContent=t;ov.appendChild(d);
   labs.push({d,g:G.CP,v:new THREE.Vector3(CPC.x+DIRS[k][0]*(CPR+16),1,CPC.z+DIRS[k][1]*(CPR+16)),k:'r'});});
-ROOMS.forEach(r=>{const d=document.createElement('div');d.className='rl';d.textContent=r[0];ov.appendChild(d);labs.push({d,g:G.F,v:new THREE.Vector3(r[1],r[2],r[3]),k:'r'});});
+const RDIM={'Кухня 8,0 м²':'260×310','Прихожая 7,5 м²':'150×310','Гардероб':'200×127','WC 3,4 м²':'200×170','Гостиная 34,7 м²':'630×550, потолок 248','Лестница':'210×220'};
+ROOMS.forEach(r=>{const d=document.createElement('div');d.className='rl';d.textContent=r[0];d.dataset.base=r[0];d.dataset.dim=RDIM[r[0]]||'';ov.appendChild(d);labs.push({d,g:G.F,v:new THREE.Vector3(r[1],r[2],r[3]),k:'r'});});
 const LGT=['Открытый ящик 60, полка','Шкаф 116: плита, 3 ящика','Пенал 60: помойка, духовка, противни над ней, 2 полки','Пенал 29×74: химия / для выпечки / запасы','Шкаф 70, 2 ящика','Шкаф 70: полка и ящик','Навесной 60, 2 отсека','Навесной 28, 2 отсека','Навесной 60: вытяжка, сплошная дверь','Навесной 28, 2 отсека','Открытый ящик 60, полка','Посудомойка 60','Мойка 60, дверь, без полки (измельчитель, фильтр)','Морозилка 182 + шкаф над ней','Холодильник 182 + шкаф над ним','Навесной 60, 2 отсека','Навесной 60, 2 отсека','Навесной 60: сушилка, полка, дверь','Стол у окна 140×60','Столешница 95','Стол 90×185, ножка 20 (отступ 45)','Полка 140×31 с подсветкой','Полка 110×31 с подсветкой','Гостиная: декор-панель 50 (брусья)','Гостиная: комод 190×40×60 на ножках 25, 4 двери (push-to-open), 1 полка','Гостиная: декор-панель 30 (брусья, кабель)','Гостиная: каркасная полка 30×30 до потолка, LED на каждой полке','Гостиная: полка 140×31 с подсветкой','Гостиная: полка 110×31 с подсветкой','Гостиная: ТВ на стене (диагональ и положение меняются ползунками)','Гостиная: ТВ-тумба ≈399×35×30 на ножках 25, 4 откидных фасада, скрывает розетки','Гостиная: декор-панель из брусьев у лестницы, ширина регулируется','Гостиная: угловой диван 300 см с оттоманкой, 2 подлокотника','Гостиная: журнальный столик 140×60×37 (дуб)','WC: подвесной унитаз на инсталляции 78×21 до потолка','WC: душ 91,5×108,5, поддон из плитки, угловые двери','WC: раковина 59×40, тумба с 2 ящиками','WC: зеркало 50×70 со скруглёнными углами и подсветкой','WC: шкаф 90×40 до потолка: швабры и пылесос внизу, полки для полотенец сверху','Гардероб: короб гребёнок тёплого пола 115×11×57','Гардероб: щитки слаботочки (верх) и электропитания (низ)','Гардероб: модули у стены WC, глубина 42: колонна полок 40 + 2 секции со штангой и обувью','Гардероб: модуль на всю восточную стену 127: штанга, корзина, полка над гребёнками','Прихожая: скамья 180×40 на полу, сиденье 50: у двери отсек с полкой и дверцей, 2 открытых отсека во всю высоту','Прихожая: дубовая панель 180 с 5 крючками и полка с подсветкой','Прихожая: тумба 95×40 на ножках 25, 2 ящика','Прихожая: рейки до потолка и круглое зеркало Ø75 с подсветкой'];
 document.getElementById('lg').innerHTML=LGT.map((t,i)=>'<div><b>'+(i+1)+'</b> '+t+'</div>').join('');
 
@@ -690,6 +695,92 @@ Object.values(POSE).forEach(g=>MAN_G.add(g));
 (g=>{head(g,[0,20,0]);limb(g,[0,14,14],[0,12,75],4);
  limb(g,[-10,11,75],[-13,6,160],3);limb(g,[10,11,75],[13,6,160],3);
  limb(g,[-16,13,20],[-22,8,-18],2.5);limb(g,[16,13,20],[22,8,-18],2.5);limb(g,[-16,13,20],[16,13,20],2.5);})(POSE.prone);
+
+/* ---------- Инженерный режим и рулетка ---------- */
+let eng=false,ruler=false;
+G.EN=new THREE.Group();scene.add(G.EN);
+G.RU=new THREE.Group();scene.add(G.RU);
+const enMat=new THREE.LineBasicMaterial({color:0xE24B4A}),ruMat=new THREE.LineBasicMaterial({color:0x185FA5});
+let ENITEMS=[],engLabs=[];
+function engItems(){
+  const it=[],A=(n,x0,x1,y0,y1,z0,z1)=>it.push({n,x0,x1,y0,y1,z0,z1});
+  A('1',0,60,0,85,0,60);A('2',0,60,0,85,60,176);A('3',0,60,0,CEIL,176,236);A('4',0,60,0,CEIL,236,310);
+  A('5',0,60,0,85,310,380);A('6',0,60,0,85,380,450);
+  A('7',0,40,138,245,0,60);A('8',0,40,138,245,60,88);A('9',0,40,138,245,88,148);A('10',0,40,138,245,148,176);
+  A('11',200,260,0,85,0,60);A('12',200,260,0,85,60,120);A('13',200,260,0,85,120,180);A('14',200,260,0,CEIL,180,240);A('15',200,260,0,CEIL,240,300);
+  A('16',220,260,138,245,0,60);A('17',220,260,138,245,60,120);A('18',220,260,138,245,120,180);
+  A('19',60,200,81,85,0,60);A('21',0,185,0,85,405,495);A('22',0,31,140,143,310,450);A('23',0,31,190,193,310,420);
+  A('24',0,4.5,0,CEIL,537,587);A('25',0,42,0,85,587,777);A('26',0,4.5,0,CEIL,777,807);A('27',0,30,0,CEIL,807,837);
+  A('28',0,31,140,143,637,777);A('29',0,31,190,193,667,777);
+  const tv=tvDims(TVS.diag);A('30',626-tv.t,626,TVS.yc-tv.h/2,TVS.yc+tv.h/2,TVS.zc-tv.w/2,TVS.zc+tv.w/2);
+  A('31',593,630,0,55,420,819.25);A('32',625.5,630,0,CEIL,390,390+epW);
+  const {xb,zs,len,dep,chL,side}=SOFA,ze=zs+len,cz=side==='S'?ze-100:zs;
+  A('33',xb,xb+dep,0,85,zs,ze);A('33',xb+dep,xb+chL,0,49,cz,cz+100);
+  A('34',400,460,0,37,567,707);
+  A('35',609,630,0,CEIL,225.5,303.5);A('35',556,609,28,44,246,283);
+  A('36',521.5,630,0,200,133.5,225);A('37',440,499,35,86,263.5,303.5);A('39',430,520,0,CEIL,133.5,173.5);
+  A('40',619,630,0,57,0,115);A('42',430,588,0,CEIL,85,127);A('43',588,630,0,CEIL,0,127);
+  A('44',270,311,0,50,15,195);A('45',270,295,190,193,15,195);A('46',274.5,315.5,0,95,210,305);A('47',270,274.5,0,CEIL,205,310);
+  A('Л',420,630,0,CEIL,310,530);
+  return it;
+}
+const WALLSEG=[[0,0,0,860],[630,0,630,860],[0,0,260,0],[270,0,630,0],[0,860,630,860],[260,0,260,310],[270,0,270,310],[420,0,420,310],[430,0,430,310],[430,127,630,127],[430,133.5,630,133.5],[430,303.5,630,303.5],[430,310,630,310]];
+function engBuild(){
+  while(G.EN.children.length)G.EN.remove(G.EN.children[0]);
+  engLabs.forEach(l=>l.d.remove());engLabs=[];
+  ENITEMS=engItems();
+  const a=[];
+  ENITEMS.forEach(b=>{
+    const c=[[b.x0,b.z0],[b.x1,b.z0],[b.x1,b.z1],[b.x0,b.z1]];
+    for(let i=0;i<4;i++){const p=c[i],q=c[(i+1)%4];a.push(p[0],0.6,p[1],q[0],0.6,q[1]);
+      if(b.y0>1){a.push(p[0],0.6,p[1],p[0],b.y0,p[1]);a.push(p[0],b.y0,p[1],q[0],b.y0,q[1]);}}
+    if(b.n==='Л')return;
+    const dx=b.x1-b.x0,dz=b.z1-b.z0,w=Math.max(dx,dz),d=Math.min(dx,dz),h=b.y1-b.y0;
+    const f=v=>Math.round(v*10)/10;
+    const el=document.createElement('div');el.className='dl';
+    el.textContent=f(w)+'×'+f(d)+'×'+f(h)+(b.y0>1?' ↑'+f(b.y0):'');ov.appendChild(el);
+    engLabs.push({d:el,v:new THREE.Vector3((b.x0+b.x1)/2,b.y1+3,(b.z0+b.z1)/2)});
+  });
+  const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(a,3));
+  G.EN.add(new THREE.LineSegments(g,enMat));
+}
+let rA=null,rB=null,rH=null;
+const ruLab=document.createElement('div');ruLab.className='rul';ov.appendChild(ruLab);
+const plane0=new THREE.Plane(new THREE.Vector3(0,1,0),0);
+function floorPoint(e){
+  const r=cv.getBoundingClientRect();
+  ray.setFromCamera(new THREE.Vector2(((e.clientX-r.left)/r.width)*2-1,-((e.clientY-r.top)/r.height)*2+1),cam);
+  const v=new THREE.Vector3();return ray.ray.intersectPlane(plane0,v)?v:null;
+}
+function snap(p){
+  if(!p)return null;
+  const SN=mode==='fp'?10:Math.max(8,rad*0.012);
+  let best=null,bd=SN;
+  const segs=WALLSEG.slice();
+  ENITEMS.forEach(b=>{segs.push([b.x0,b.z0,b.x1,b.z0],[b.x1,b.z0,b.x1,b.z1],[b.x1,b.z1,b.x0,b.z1],[b.x0,b.z1,b.x0,b.z0]);});
+  segs.forEach(([x0,z0,x1,z1])=>[[x0,z0],[x1,z1]].forEach(([x,z])=>{const d=Math.hypot(p.x-x,p.z-z);if(d<bd){bd=d;best={x,z,k:'c'};}}));
+  if(best)return best;
+  bd=SN*0.8;
+  segs.forEach(([x0,z0,x1,z1])=>{const vx=x1-x0,vz=z1-z0,L2=vx*vx+vz*vz;if(!L2)return;
+    const t=clamp(((p.x-x0)*vx+(p.z-z0)*vz)/L2,0,1),x=x0+vx*t,z=z0+vz*t,d=Math.hypot(p.x-x,p.z-z);if(d<bd){bd=d;best={x,z,k:'e'};}});
+  return best||{x:p.x,z:p.z,k:'f'};
+}
+function dot(x,z,col){const m=new THREE.Mesh(new THREE.SphereGeometry(2.2,12,8),new THREE.MeshBasicMaterial({color:col}));m.position.set(x,1.5,z);G.RU.add(m);}
+function drawRuler(){
+  while(G.RU.children.length)G.RU.remove(G.RU.children[0]);
+  const B=rB||rH;
+  if(rA)dot(rA.x,rA.z,0x185FA5);
+  if(rH&&!rB)dot(rH.x,rH.z,rH.k==='f'?0x888780:0xE24B4A);
+  if(rA&&B){
+    const g=new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(rA.x,1.5,rA.z),new THREE.Vector3(B.x,1.5,B.z)]);
+    G.RU.add(new THREE.Line(g,ruMat));if(rB)dot(rB.x,rB.z,0x185FA5);
+  }
+}
+function rulerClick(e){
+  const p=snap(floorPoint(e));if(!p)return;
+  if(!rA||rB){rA=p;rB=null;}else rB=p;
+  rH=null;drawRuler();draw();
+}
 
 /* ---------- Камеры и управление ---------- */
 const cap={
@@ -725,7 +816,8 @@ function setView(m){
 }
 function lookDir(){return new THREE.Vector3(Math.sin(yaw)*Math.cos(pitch),Math.sin(pitch),-Math.cos(yaw)*Math.cos(pitch));}
 function draw(){
-  G.LD.visible=G.RD.visible=G.VD.visible=doors;G.LG.visible=G.RG.visible=lines;G.LL.visible=G.RL.visible=G.VL.visible=G.WCL.visible=G.HL.visible=leds;
+  const hs=(mode==='d3'||mode==='fp');G.EN.visible=eng&&hs;G.RU.visible=ruler&&eng&&hs;
+  G.LD.visible=G.RD.visible=G.VD.visible=doors;G.LG.visible=G.RG.visible=eng;G.LL.visible=G.RL.visible=G.VL.visible=G.WCL.visible=G.HL.visible=leds;
   G.DR.visible=(mode==='d3'||mode==='fp')&&wallMode==='full';
   MAN_G.position.set(E.x,0,E.z);MAN_G.rotation.y=-yaw;
   Object.keys(POSE).forEach(k=>POSE[k].visible=(k===stance));
@@ -750,6 +842,14 @@ function draw(){
     const ok=show&&l.g.visible&&p.z<1&&p.z>-1&&Math.abs(p.x)<1.05&&Math.abs(p.y)<1.05;
     l.d.style.display=ok?'block':'none';l.d.style.left=((p.x*.5+.5)*W0)+'px';l.d.style.top=((-p.y*.5+.5)*H0)+'px';
   });
+  const showE=eng&&hs;
+  engLabs.forEach(l=>{const p=l.v.clone().project(cam);const ok=showE&&p.z<1&&p.z>-1&&Math.abs(p.x)<1.05&&Math.abs(p.y)<1.05;
+    l.d.style.display=ok?'block':'none';if(ok){l.d.style.left=((p.x*.5+.5)*W0)+'px';l.d.style.top=((-p.y*.5+.5)*H0)+'px';}});
+  const B=rB||rH;
+  if(showE&&ruler&&rA&&B){const m=new THREE.Vector3((rA.x+B.x)/2,1.5,(rA.z+B.z)/2).project(cam);
+    if(m.z<1&&m.z>-1){ruLab.style.display='block';ruLab.style.left=((m.x*.5+.5)*W0)+'px';ruLab.style.top=((-m.y*.5+.5)*H0)+'px';
+      ruLab.textContent=(Math.round(Math.hypot(B.x-rA.x,B.z-rA.z)*10)/10)+' см'+(rB?'':' …');}else ruLab.style.display='none';}
+  else ruLab.style.display='none';
 }
 const vb=document.getElementById('vb');
 [['d3','3D'],['fp','Изнутри'],['l','Левая стена'],['r','Правая стена'],['w','Окно']].forEach(([m,t])=>{
@@ -765,7 +865,6 @@ syncWallBtn();vb.appendChild(wb);
 tog('Двери шкафов',()=>doors,v=>doors=v);
 tog('Номера',()=>nums,v=>nums=v);
 tog('Свет',()=>leds,v=>leds=v);
-tog('Линии',()=>lines,v=>lines=v);
 const cb=document.createElement('button');const cbu=()=>cb.textContent='Шторы: '+(curtainsOpen?'открыты':'закрыты');cbu();
 cb.onclick=()=>{curtainsOpen=!curtainsOpen;buildCurtains();cbu();draw();};vb.appendChild(cb);
 
@@ -883,12 +982,13 @@ function joyEnd(e){if(joy&&e.pointerId===joy.id){joy=null;joyEl.style.display='n
 cv.addEventListener('pointerup',e=>{
   if(joyEnd(e))return;
   const p=pts.get(e.pointerId);
-  try{if(p&&pts.size===1&&(mode==='fp'||mode==='d3')&&p.b===0&&Math.hypot(e.clientX-p.sx,e.clientY-p.sy)<6&&performance.now()-p.t0<500)pick(e);}
+  try{if(p&&pts.size===1&&(mode==='fp'||mode==='d3')&&p.b===0&&Math.hypot(e.clientX-p.sx,e.clientY-p.sy)<6&&performance.now()-p.t0<500){if(ruler&&eng)rulerClick(e);else pick(e);}}
   finally{pts.delete(e.pointerId);pinch=0;mid=null;}});
 cv.addEventListener('lostpointercapture',e=>{if(joyEnd(e))return;pts.delete(e.pointerId);pinch=0;mid=null;});
 cv.addEventListener('pointercancel',e=>{if(joyEnd(e))return;pts.delete(e.pointerId);pinch=0;mid=null;});
 cv.addEventListener('pointermove',e=>{
   if(joy&&e.pointerId===joy.id){let dx=e.clientX-joy.sx,dy=e.clientY-joy.sy;const L=Math.hypot(dx,dy);if(L>50){dx*=50/L;dy*=50/L;}joy.dx=dx;joy.dy=dy;joyK.style.transform='translate('+dx+'px,'+dy+'px)';return;}
+  if(ruler&&eng&&pts.size===0&&(mode==='d3'||mode==='fp')){if(!rB){rH=snap(floorPoint(e));drawRuler();draw();}return;}
   if(!pts.has(e.pointerId)||(mode!=='d3'&&mode!=='fp'))return;
   const p=pts.get(e.pointerId);
   const k=mode==='fp'?0.3:rad*0.0011;
@@ -908,6 +1008,11 @@ cv.addEventListener('pointermove',e=>{
 });
 function resize(){W0=el.clientWidth;H0=el.clientHeight;ren.setSize(W0,H0);pc.aspect=fc.aspect=W0/H0;pc.updateProjectionMatrix();fc.updateProjectionMatrix();setView(mode);}
 window.addEventListener('resize',resize);
+const engb=document.getElementById('engb'),rulb=document.getElementById('rulb');
+function engSync(){engb.classList.toggle('on',eng);rulb.style.display=eng?'block':'none';rulb.classList.toggle('on',ruler);
+  document.querySelectorAll('.rl').forEach(d=>d.textContent=eng&&d.dataset.dim?d.dataset.base+' · '+d.dataset.dim:d.dataset.base);}
+engb.addEventListener('click',()=>{eng=!eng;if(eng)engBuild();else{ruler=false;rA=rB=rH=null;drawRuler();}engSync();draw();});
+rulb.addEventListener('click',()=>{ruler=!ruler;rA=rB=rH=null;drawRuler();engSync();draw();});
 const wrapEl=document.getElementById('wrap'),fsb=document.getElementById('fsb'),fsm=document.getElementById('fsm');
 function fsSync(){const on=wrapEl.classList.contains('fs');fsb.textContent=on?'✕ Выйти':'⛶ На весь экран';fsm.textContent=mode==='fp'?'3D':'Изнутри';setTimeout(resize,60);}
 fsb.addEventListener('click',()=>{
@@ -923,7 +1028,7 @@ document.addEventListener('fullscreenchange',fsChange);document.addEventListener
 fsm.addEventListener('click',()=>{setView(mode==='fp'?'d3':'fp');fsSync();});
 const epIn=document.getElementById('epw'),epV=document.getElementById('epwv');
 function epText(){const edge=TVS.zc-tvDims(TVS.diag).w/2,gap=Math.round(edge-(390+epW));epV.textContent=epW+' см'+(gap<0?' (заходит за ТВ на '+(-gap)+' см)':' (до ТВ '+gap+' см)');}
-epIn.addEventListener('input',()=>{epW=+epIn.value;epText();buildEP();draw();});
+epIn.addEventListener('input',()=>{epW=+epIn.value;epText();buildEP();if(eng)engBuild();draw();});
 epText();
 const sfx=document.getElementById('sfx'),sfz=document.getElementById('sfz'),sfs=document.getElementById('sfs'),sfi=document.getElementById('sfi');
 function sofaInfo(){
@@ -938,9 +1043,9 @@ function sofaInfo(){
   const toConsole=Math.round(595-(xb+chL));
   sfi.textContent='До экрана от глаз ≈ '+dist+' см ('+(dist/dg).toFixed(2)+' × диагональ) · проход у комода '+pass+' см · до угла стола '+tableGap+' см · запас до двери на террасу '+doorL+' см · от оттоманки до ТВ-тумбы '+toConsole+' см';
 }
-sfx.addEventListener('input',()=>{SOFA.xb=+sfx.value;document.getElementById('sfxv').textContent=sfx.value;buildSofa();sofaInfo();draw();});
-sfz.addEventListener('input',()=>{SOFA.zs=+sfz.value;document.getElementById('sfzv').textContent=sfz.value;buildSofa();sofaInfo();draw();});
-sfs.addEventListener('click',()=>{SOFA.side=SOFA.side==='S'?'N':'S';sfs.textContent='Оттоманка: '+(SOFA.side==='S'?'у окна':'у кухни');buildSofa();sofaInfo();draw();});
+sfx.addEventListener('input',()=>{SOFA.xb=+sfx.value;document.getElementById('sfxv').textContent=sfx.value;buildSofa();sofaInfo();if(eng)engBuild();draw();});
+sfz.addEventListener('input',()=>{SOFA.zs=+sfz.value;document.getElementById('sfzv').textContent=sfz.value;buildSofa();sofaInfo();if(eng)engBuild();draw();});
+sfs.addEventListener('click',()=>{SOFA.side=SOFA.side==='S'?'N':'S';sfs.textContent='Оттоманка: '+(SOFA.side==='S'?'у окна':'у кухни');buildSofa();sofaInfo();if(eng)engBuild();draw();});
 sofaInfo();
 const tvd=document.getElementById('tvd'),tvx=document.getElementById('tvx'),tvy=document.getElementById('tvy'),tvi=document.getElementById('tvi');
 function tvUpdate(){
@@ -951,7 +1056,7 @@ function tvUpdate(){
   const bot=Math.round(TVS.yc-h/2),top=Math.round(TVS.yc+h/2),gap=bot-55;
   const mid=Math.round(TVS.zc-691);
   tvi.textContent=TVS.diag+'" ≈ '+w+'×'+h+' см · низ '+bot+' см, верх '+top+' см · над тумбой '+gap+' см · '+(mid===0?'по центру между лестницей и шторами':(mid>0?'смещён к шторам на '+mid+' см':'смещён к лестнице на '+(-mid)+' см'));
-  epText();sofaInfo();draw();
+  epText();sofaInfo();if(eng)engBuild();draw();
 }
 [tvd,tvx,tvy].forEach(e=>e.addEventListener('input',tvUpdate));tvd.addEventListener('change',tvUpdate);
 tvUpdate();
