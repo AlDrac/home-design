@@ -36,7 +36,7 @@ h1{font-size:20px;font-weight:500;margin:0 0 4px}
 .vlb,.vla{position:absolute;transform:translate(-50%,-100%);font-size:10.5px;font-weight:500;border-radius:4px;padding:1px 5px;white-space:nowrap;pointer-events:none;max-width:260px}
 .vlb{color:#0C447C;background:rgba(230,241,251,.92);border:1px solid #85B7EB}
 .vla{color:#633806;background:rgba(250,238,218,.92);border:1px solid #EF9F27}
-#venb{top:48px;left:8px}
+#venb{top:48px;left:8px}#tvb{top:48px;left:150px}#tvs{top:88px;left:8px;display:none}
 #cap{font-size:12px;color:var(--tx2);padding:6px 0}
 #lg{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:2px 16px;font-size:13px;color:var(--tx2);padding:8px 0}
 #lg b{color:var(--tx);font-weight:500}
@@ -48,7 +48,7 @@ h2{font-size:15px;font-weight:500;margin:14px 0 2px}
 <h1>Первый этаж — 3D модель</h1>
 <p class="sub">Кухня детально, остальные комнаты по плану KRT 4. Размеры в сантиметрах, высота потолка 248.</p>
 <div class="vb" id="vb"></div>
-<div id="wrap"><div id="cv" tabindex="0"></div><div id="ov"></div><div id="joy"><div id="joyk"></div></div><button id="engb" class="ovb">📐 Инженерный режим</button><button id="venb" class="ovb">🌀 Вентиляция</button><button id="rulb" class="ovb">📏 Рулетка</button><button id="fsm" class="ovb">Изнутри</button><button id="fsb" class="ovb">⛶ На весь экран</button></div>
+<div id="wrap"><div id="cv" tabindex="0"></div><div id="ov"></div><div id="joy"><div id="joyk"></div></div><button id="engb" class="ovb">📐 Инженерный режим</button><button id="venb" class="ovb">🌀 Вентиляция</button><button id="tvb" class="ovb">📺 Видео на ТВ</button><button id="tvs" class="ovb">🔇 Звук выкл</button><input id="tvf" type="file" accept="video/*,image/*" style="display:none"><button id="rulb" class="ovb">📏 Рулетка</button><button id="fsm" class="ovb">Изнутри</button><button id="fsb" class="ovb">⛶ На весь экран</button></div>
 <div id="cap"></div>
 <div class="vb" id="pad"></div>
 <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--tx2);padding:4px 0 8px"><label for="epw">Панель у лестницы (№32), ширина:</label><input id="epw" type="range" min="40" max="220" step="1" value="160" style="flex:1;max-width:320px"><span id="epwv" style="color:var(--tx);min-width:60px">160 см</span></div>
@@ -451,7 +451,7 @@ function buildTV(){
   while(G.TVS.children.length)G.TVS.remove(G.TVS.children[0]);
   const {w,h,t}=tvDims(TVS.diag),x1=626,zc=TVS.zc,y0=TVS.yc-h/2;
   box(G.TVS,x1-t,y0,zc-w/2,t,h,w,0x2C2C2A);
-  const m=new THREE.Mesh(new THREE.PlaneGeometry(w-1.6,h-1.6),new THREE.MeshBasicMaterial({color:0x14181d}));
+  const m=new THREE.Mesh(new THREE.PlaneGeometry(w-1.6,h-1.6),TVS.tex?new THREE.MeshBasicMaterial({map:TVS.tex}):new THREE.MeshBasicMaterial({color:0x14181d}));m.userData.tvScreen=true;
   m.rotation.y=-Math.PI/2;m.position.set(x1-t-0.05,y0+h/2,zc);G.TVS.add(m);
   const bw=Math.min(100,w*0.6),bh=Math.min(70,h*0.6);
   box(G.TVS,x1,y0+h/2-bh/2,zc-bw/2,4,bh,bw,0x444441);
@@ -1142,6 +1142,7 @@ function pick(e){
     if(!o.isMesh||!visChain(o))continue;
     if(o.material&&o.material.transparent&&o.material.opacity<0.5)continue;
     if(MAN_G.visible&&o.parent&&o.parent.parent===MAN_G)continue;
+    if(o.userData.tvScreen&&tvVid){if(tvVid.muted){tvVid.muted=false;tvVid.play().catch(()=>{});}else if(tvVid.paused)tvVid.play().catch(()=>{});else tvVid.pause();sndSync();vidLoop();return;}
     let q=o;while(q&&!q.userData.mov)q=q.parent;
     if(q){const m=q.userData.mov;m.target=m.target?0:1;kick();}
     return;
@@ -1183,6 +1184,29 @@ function engSync(){engb.classList.toggle('on',eng);rulb.style.display=eng?'block
   document.querySelectorAll('.rl').forEach(d=>d.textContent=eng&&d.dataset.dim?d.dataset.base+' · '+d.dataset.dim:d.dataset.base);}
 engb.addEventListener('click',()=>{eng=!eng;if(eng)engBuild();else{ruler=false;rA=rB=rH=null;drawRuler();}engSync();draw();});
 document.getElementById('venb').addEventListener('click',e=>{vent=!vent;e.currentTarget.classList.toggle('on',vent);draw();});
+let tvVid=null,tvUrl=null;
+const tvs=document.getElementById('tvs');
+function sndSync(){if(!tvVid){tvs.style.display='none';return;}tvs.style.display='block';tvs.textContent=tvVid.muted?'🔇 Звук выкл':'🔊 Звук вкл';tvs.classList.toggle('on',!tvVid.muted);}
+tvs.addEventListener('click',()=>{if(!tvVid)return;tvVid.muted=!tvVid.muted;if(!tvVid.muted){tvVid.volume=1;tvVid.play().catch(()=>{});vidLoop();}sndSync();});
+function vidLoop(){if(tvVid&&!tvVid.paused){draw();requestAnimationFrame(vidLoop);}else draw();}
+const tvb=document.getElementById('tvb'),tvf=document.getElementById('tvf');
+function tvOff(){if(tvVid){tvVid.pause();tvVid.removeAttribute('src');tvVid.load();tvVid=null;}if(tvUrl){URL.revokeObjectURL(tvUrl);tvUrl=null;}
+  if(TVS.tex){TVS.tex.dispose();TVS.tex=null;}buildTV();tvb.textContent='📺 Видео на ТВ';tvb.classList.remove('on');sndSync();draw();}
+tvb.addEventListener('click',()=>{if(TVS.tex){tvOff();return;}tvf.value='';tvf.click();});
+tvf.addEventListener('change',()=>{
+  const f=tvf.files&&tvf.files[0];if(!f)return;
+  tvOff();tvUrl=URL.createObjectURL(f);
+  if(f.type.startsWith('image/')){
+    new THREE.TextureLoader().load(tvUrl,t=>{TVS.tex=t;buildTV();draw();});
+  }else{
+    const v=document.createElement('video');v.src=tvUrl;v.loop=true;v.playsInline=true;v.crossOrigin='anonymous';
+    tvVid=v;TVS.tex=new THREE.VideoTexture(v);TVS.tex.minFilter=THREE.LinearFilter;buildTV();
+    v.muted=false;v.volume=1;
+    v.play().then(()=>{sndSync();vidLoop();}).catch(()=>{v.muted=true;v.play().then(()=>{sndSync();vidLoop();}).catch(()=>{});sndSync();});
+    sndSync();
+  }
+  tvb.textContent='✕ Выключить ТВ';tvb.classList.add('on');
+});
 rulb.addEventListener('click',()=>{ruler=!ruler;rA=rB=rH=null;drawRuler();engSync();draw();});
 const wrapEl=document.getElementById('wrap'),fsb=document.getElementById('fsb'),fsm=document.getElementById('fsm');
 function fsSync(){const on=wrapEl.classList.contains('fs');fsb.textContent=on?'✕ Выйти':'⛶ На весь экран';fsm.textContent=mode==='fp'?'3D':'Изнутри';setTimeout(resize,60);}
