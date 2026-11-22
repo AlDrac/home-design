@@ -313,8 +313,8 @@ function U(o){
   if(o.kind==='stack')o.ys.forEach(a=>makeSwing(g,s,x1,a[0],a[1]-a[0],z+(o.dz0||0),w-(o.dz0||0)-(o.dz1||0),!!o.hmin,fc,(a[0]+a[1])/2-6,o.nh));
   if(o.base){bx(g,s,3,0,z,57,10,w,DARK);}
 }
-U({s:'L',z:0,w:60,y:10,h:72,x1:60,sh:[28],kind:'open',base:1});
-U({s:'L',z:60,w:116,y:10,h:72,x1:60,solid:1,gola:1,kind:'drawers',ys:[[10,38],[38,68],[68,82]],base:1});
+U({s:'L',z:0,w:60,y:10,h:72,x1:60,sh:[36],kind:'open',base:1});
+U({s:'L',z:60,w:116,y:10,h:72,x1:60,solid:1,gola:1,kind:'drawers',ys:[[10,46],[46,68],[68,82]],base:1});
 U({s:'L',z:176,w:60,y:10,h:72,x1:60,solid:1,base:1});
 [[10,46],[46,82]].forEach(a=>{const g=makeDrawer(G.L,'L',60,a[0],a[1],176,60,FR,45,a[1]-3,true);
   bx(G.L,'L',60,a[1]-3,176,0.2,3,60,0x2C2C2A);
@@ -349,7 +349,7 @@ U({s:'L',z:148,w:28,hmax:1,y:140,h:105,x1:40,sh:[50],wall:1,kind:'door',up:1});
 box(G.T,0,82,405,185,4,90,TOP);
 box(G.T,136,0,440,4,82,20,CAB);
 box(G.W,60,82,0,140,4,60,TOP);
-U({s:'R',z:0,w:60,y:10,h:72,x1:60,sh:[28],kind:'open',base:1});
+U({s:'R',z:0,w:60,y:10,h:72,x1:60,sh:[36],kind:'open',base:1});
 U({s:'R',z:60,w:60,y:10,h:72,x1:60,solid:1,col:APP,fc:APF,gola:1,kind:'hor',base:1});
 U({s:'R',z:120,w:60,y:10,h:72,x1:60,gola:1,kind:'door',base:1});
 U({s:'R',z:180,w:60,y:10,h:180,x1:60,solid:1,col:APP,fc:APF,kind:'stack',hmin:1,dz1:1.5,nh:1,ys:[[10,190]],base:1});
