@@ -36,7 +36,7 @@ h1{font-size:20px;font-weight:500;margin:0 0 4px}
 .vlb,.vla{position:absolute;transform:translate(-50%,-100%);font-size:10.5px;font-weight:500;border-radius:4px;padding:1px 5px;white-space:nowrap;pointer-events:none;max-width:260px}
 .vlb{color:#0C447C;background:rgba(230,241,251,.92);border:1px solid #85B7EB}
 .vla{color:#633806;background:rgba(250,238,218,.92);border:1px solid #EF9F27}
-#venb{top:48px;left:8px}#tvb{top:48px;left:150px}#tvs{top:88px;left:8px;display:none}
+#venb{top:48px;left:8px}#tvb{top:48px;left:150px}#tvs{top:88px;left:8px;display:none}#xmb{top:48px;left:300px}
 #cap{font-size:12px;color:var(--tx2);padding:6px 0}
 #lg{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:2px 16px;font-size:13px;color:var(--tx2);padding:8px 0}
 #lg b{color:var(--tx);font-weight:500}
@@ -48,7 +48,7 @@ h2{font-size:15px;font-weight:500;margin:14px 0 2px}
 <h1>Первый этаж — 3D модель</h1>
 <p class="sub">Кухня детально, остальные комнаты по плану KRT 4. Размеры в сантиметрах, высота потолка 248.</p>
 <div class="vb" id="vb"></div>
-<div id="wrap"><div id="cv" tabindex="0"></div><div id="ov"></div><div id="joy"><div id="joyk"></div></div><button id="engb" class="ovb">📐 Инженерный режим</button><button id="venb" class="ovb">🌀 Вентиляция</button><button id="tvb" class="ovb">📺 Видео на ТВ</button><button id="tvs" class="ovb">🔇 Звук выкл</button><input id="tvf" type="file" accept="video/*,image/*" style="display:none"><button id="rulb" class="ovb">📏 Рулетка</button><button id="fsm" class="ovb">Изнутри</button><button id="fsb" class="ovb">⛶ На весь экран</button></div>
+<div id="wrap"><div id="cv" tabindex="0"></div><div id="ov"></div><div id="joy"><div id="joyk"></div></div><button id="engb" class="ovb">📐 Инженерный режим</button><button id="venb" class="ovb">🌀 Вентиляция</button><button id="tvb" class="ovb">📺 Видео на ТВ</button><button id="tvs" class="ovb">🔇 Звук выкл</button><button id="xmb" class="ovb">🎄 Рождество</button><input id="tvf" type="file" accept="video/*,image/*" style="display:none"><button id="rulb" class="ovb">📏 Рулетка</button><button id="fsm" class="ovb">Изнутри</button><button id="fsb" class="ovb">⛶ На весь экран</button></div>
 <div id="cap"></div>
 <div class="vb" id="pad"></div>
 <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--tx2);padding:4px 0 8px"><label for="epw">Панель у лестницы (№32), ширина:</label><input id="epw" type="range" min="40" max="220" step="1" value="160" style="flex:1;max-width:320px"><span id="epwv" style="color:var(--tx);min-width:60px">160 см</span></div>
@@ -324,10 +324,10 @@ bx(G.L,'L',0,82,176,60,59.5,60,CAB);
  lbox(pv,'L',0,0,176.3,1.95,59.5,59.4,APF);lbox(pv,'L',1.95,8,182,0.4,34,48,0x2C2C2A);lbox(pv,'L',2,50,184,2.5,1.5,44,DARK);})();
 U({s:'L',z:176,w:60,y:141.5,h:106.5,x1:60,sh:[48.5,77.5],nh:1,kind:'dstack',ys:[[141.5,248]]});
 bx(G.L,'L',0,0,236,31,248,74,SH);
-U({s:'L',z:236,w:74,hmax:1,dz0:3,nh:1,y:10,h:238,x0:31,x1:60,sh:[28,72,100,131.5,155,180,209],kind:'dstack',ys:[[10,82],[82,141.5],[141.5,248]]});
-U({s:'L',z:310,w:70,y:10,h:72,x1:60,solid:1,gola:1,kind:'drawers',ys:[[10,38],[38,82]],base:1});
-U({s:'L',z:380,w:70,y:10,h:28,x1:60,solid:1,gola:1,kind:'drawers',ys:[[10,38]],base:1});
-U({s:'L',z:380,w:70,y:38,h:44,x1:60,kind:'open'});
+U({s:'L',z:236,w:74,hmax:1,dz0:3,nh:1,y:10,h:238,x0:31,x1:60,sh:[36,72,100,131.5,155,180,209],kind:'dstack',ys:[[10,82],[82,141.5],[141.5,248]]});
+U({s:'L',z:310,w:70,y:10,h:72,x1:60,solid:1,gola:1,kind:'drawers',ys:[[10,46],[46,82]],base:1});
+U({s:'L',z:380,w:70,y:10,h:36,x1:60,solid:1,gola:1,kind:'drawers',ys:[[10,46]],base:1});
+U({s:'L',z:380,w:70,y:46,h:36,x1:60,kind:'open'});
 box(G.L,0,82,0,60,4,176,TOP);
 box(G.L,0,82,310,60,4,95,TOP);
 bx(G.L,'L',0,140,310,31,3,140,FR);
@@ -841,6 +841,36 @@ G.VN=new THREE.Group();scene.add(G.VN);
 })();
 G.VN.visible=false;
 
+/* ---------- Рождественский режим ---------- */
+let xmas=false;
+G.XM=new THREE.Group();scene.add(G.XM);G.XM.visible=false;
+(()=>{let seed=7;const rnd=()=>{seed=(seed*9301+49297)%233280;return seed/233280;};
+ const cx=220,cz=808,TH=150;
+ const mat=c=>new THREE.MeshLambertMaterial({color:c});
+ const st=new THREE.Mesh(new THREE.CylinderGeometry(16,20,10,20),mat(0x8A2B1E));st.position.set(cx,5,cz);G.XM.add(st);
+ const tr=new THREE.Mesh(new THREE.CylinderGeometry(3,3.5,20,10),mat(0x6B4A2E));tr.position.set(cx,15,cz);G.XM.add(tr);
+ [[40,62,22],[33,52,62],[25,42,95],[16,32,123]].forEach(([r,h,y])=>{const c=new THREE.Mesh(new THREE.ConeGeometry(r,h,20),mat(0x2F6B3A));c.position.set(cx,y+h/2,cz);G.XM.add(c);});
+ const starM=new THREE.MeshBasicMaterial({color:0xFFD34D});
+ const sh=new THREE.Shape();for(let i=0;i<10;i++){const a=i*Math.PI/5+Math.PI/2,r=i%2?3.2:7.5;const x=Math.cos(a)*r,y=Math.sin(a)*r;i?sh.lineTo(x,y):sh.moveTo(x,y);}
+ const star=new THREE.Mesh(new THREE.ExtrudeGeometry(sh,{depth:1.5,bevelEnabled:false}),starM);star.position.set(cx,TH+12,cz);star.rotation.y=Math.PI/2;G.XM.add(star);
+ const cols=[0xD85A30,0xE24B4A,0xFFD34D,0x378ADD,0xF1EFE8,0xD4537E];
+ for(let i=0;i<70;i++){const t=rnd(),y=24+t*120,r=40*(1-t*0.82)*(0.92+rnd()*0.08),a=rnd()*Math.PI*2;
+  const isL=i%2===0,m=new THREE.Mesh(new THREE.SphereGeometry(isL?1.1:2.2,10,8),isL?new THREE.MeshBasicMaterial({color:0xFFE08A}):mat(cols[i%cols.length]));
+  m.position.set(cx+Math.cos(a)*r,y,cz+Math.sin(a)*r);G.XM.add(m);}
+ [[200,830,0xE24B4A],[238,826,0x378ADD],[214,786,0xFFD34D]].forEach(([x,z,c])=>{const b=new THREE.Mesh(new THREE.BoxGeometry(16,12,16),mat(c));b.position.set(x,6,z);G.XM.add(b);
+  const rb=new THREE.Mesh(new THREE.BoxGeometry(16.4,12.4,2),mat(0xF1EFE8));rb.position.set(x,6,z);G.XM.add(rb);});
+ // гирлянда-дождик под потолком по периметру гостиной
+ const tin=[new THREE.MeshLambertMaterial({color:0xD4AF37,emissive:0x3a2a00}),new THREE.MeshLambertMaterial({color:0xC9CED6,emissive:0x222428})];
+ const bulbC=[0xFFD34D,0xE24B4A,0x5DCAA5,0x85B7EB,0xED93B1];
+ let k=0;
+ function swags(p0,p1,n){for(let i=0;i<n;i++){const a=p0.clone().lerp(p1,i/n),b=p0.clone().lerp(p1,(i+1)/n),m=a.clone().lerp(b,0.5);m.y-=14;
+   const curve=new THREE.QuadraticBezierCurve3(a,m,b);
+   G.XM.add(new THREE.Mesh(new THREE.TubeGeometry(curve,16,1.6,6,false),tin[k++%2]));
+   for(let j=1;j<4;j++){const q=curve.getPoint(j/4);const bl=new THREE.Mesh(new THREE.SphereGeometry(1.2,8,6),new THREE.MeshBasicMaterial({color:bulbC[(k+j)%bulbC.length]}));bl.position.copy(q);bl.position.y-=1.5;G.XM.add(bl);}}}
+ const Y=241,V=(x,z)=>new THREE.Vector3(x,Y,z);
+ swags(V(7,312),V(7,846),9);swags(V(7,846),V(622,846),10);swags(V(622,846),V(622,312),9);
+})();
+
 /* ---------- Скрытие номеров за стенами ---------- */
 let lastOcc=0,occTimer=0;
 const occRay=new THREE.Raycaster();
@@ -1184,6 +1214,7 @@ function engSync(){engb.classList.toggle('on',eng);rulb.style.display=eng?'block
   document.querySelectorAll('.rl').forEach(d=>d.textContent=eng&&d.dataset.dim?d.dataset.base+' · '+d.dataset.dim:d.dataset.base);}
 engb.addEventListener('click',()=>{eng=!eng;if(eng)engBuild();else{ruler=false;rA=rB=rH=null;drawRuler();}engSync();draw();});
 document.getElementById('venb').addEventListener('click',e=>{vent=!vent;e.currentTarget.classList.toggle('on',vent);draw();});
+document.getElementById('xmb').addEventListener('click',e=>{xmas=!xmas;G.XM.visible=xmas;e.currentTarget.classList.toggle('on',xmas);draw();});
 let tvVid=null,tvUrl=null;
 const tvs=document.getElementById('tvs');
 function sndSync(){if(!tvVid){tvs.style.display='none';return;}tvs.style.display='block';tvs.textContent=tvVid.muted?'🔇 Звук выкл':'🔊 Звук вкл';tvs.classList.toggle('on',!tvVid.muted);}
