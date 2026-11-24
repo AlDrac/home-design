@@ -750,7 +750,7 @@ G.GR=new THREE.Group();scene.add(G.GR);
  const slant=(x0,x1,y,z0,z1)=>{const d=z1-z0,m=new THREE.Mesh(new THREE.BoxGeometry(x1-x0,1.5,d),new THREE.MeshLambertMaterial({color:C}));m.rotation.x=-0.35;m.position.set((x0+x1)/2,y+d*0.17,(z0+z1)/2);G.GR.add(m);
    box(G.GR,x0,y-1,z0,x1-x0,4,1.5,C);};
  // стена WC: модули глубиной 42, стоят на полу
- const zf=85,zb=127,D=42,zc=(zf+zb)/2,xe=588;
+ const zf=85,zb=127,D=42,RODY=188,RODB=25,zc=zb-1.2-RODB,xe=588;// RODY — высота штанг, RODB — отступ от задней стенки
  box(G.GR,433,0,zf+3,xe-436,8,D-3,DARK);
  const cw=40,xs1=430+cw,xs2=(xs1+1.6+xe-1.6)/2-0.8;
  [430,xs1,xs2,xe-1.6].forEach(x=>box(G.GR,x,8,zf,1.6,CEIL-8,D,C));
@@ -766,16 +766,16 @@ G.GR=new THREE.Group();scene.add(G.GR);
   led(G.GRL,'L',a0+1,199.7,zf+3,a1-a0-2,0.6,3,LED);
   led(G.GRL,'L',a0+1,61.7,zf+1,a1-a0-2,0.1,D-3,LED,0.18);
   box(G.GR,a0,60,zf,a1-a0,1.6,D-1.2,C);
-  rodX(a0,a1,195,zc);
+  rodX(a0,a1,RODY,zc);
   slant(a0,a1,14,zf+2,zb-4);slant(a0,a1,36,zf+2,zb-4);
  });
  // восточная стена: 82 вдоль стены, от угла с WC, над гребёнками
  const ex=xe,z0=0;
  box(G.GR,ex,CEIL-1.6,z0,630-ex,1.6,zb-z0,C);
  box(G.GR,ex,200.4,z0,630-ex,1.6,zb-z0,C);
- rodZ(z0+1,88,195,609);
- (()=>{const m=new THREE.Mesh(new THREE.CylinderGeometry(1.6,1.6,200.4-61.6,14),new THREE.MeshLambertMaterial({color:ROD}));m.position.set(609,(200.4+61.6)/2,89.5);G.GR.add(m);
-  [61.6,198.4].forEach(y=>box(G.GR,605,y,85.5,8,2,8,ROD));box(G.GR,606.5,193,86.5,5,4,6,ROD);})();
+ const RX=630-RODB;rodZ(z0+1,88,RODY,RX);
+ (()=>{const m=new THREE.Mesh(new THREE.CylinderGeometry(1.6,1.6,200.4-61.6,14),new THREE.MeshLambertMaterial({color:ROD}));m.position.set(RX,(200.4+61.6)/2,89.5);G.GR.add(m);
+  [61.6,198.4].forEach(y=>box(G.GR,RX-4,y,85.5,8,2,8,ROD));box(G.GR,RX-2.5,RODY-2,86.5,5,4,6,ROD);})();
  box(G.GR,ex,60,z0,630-ex,1.6,zb-z0,C);
  led(G.GRL,'L',ex+3,199.7,z0+2,3,0.6,86,LED);
  led(G.GRL,'L',ex+1,61.7,z0+2,40,0.1,86,LED,0.18);
@@ -807,7 +807,8 @@ G.HW=new THREE.Group();scene.add(G.HW);G.HL=new THREE.Group();G.HW.add(G.HL);
  led(G.HL,'L',X0+34,42,bz0+1.5,3,0.5,bz1-bz0-3,LED);
  // дубовая панель с крючками и полка с подсветкой
  box(G.HW,X0,50,bz0,2,140,bz1-bz0,OAK);
- [30,62,94,126,158].forEach(z=>{box(G.HW,X0+2,158,bz0+z-15,6,1.5,1.5,0x2C2C2A);box(G.HW,X0+6.5,158,bz0+z-15,1.5,5,1.5,0x2C2C2A);});
+ const HKY=172;// высота крючков
+ [30,62,94,126,158].forEach(z=>{box(G.HW,X0+2,HKY,bz0+z-15,6,1.5,1.5,0x2C2C2A);box(G.HW,X0+6.5,HKY,bz0+z-15,1.5,5,1.5,0x2C2C2A);});
  box(G.HW,X0,190,bz0,25,3,bz1-bz0,OAK);
  led(G.HL,'L',X0+19,189.4,bz0,4,0.6,bz1-bz0,LED);
  // рейки от пола до потолка
@@ -978,9 +979,9 @@ function ik(a,t,l1,l2,pole){
 // Поза: таз (y,z), наклон корпуса, угол головы, лодыжки, кисти. Вперёд — это -z.
 const ARM=AN.ua+AN.fa;
 const POSES={
- stand:{hy:AN.hip-0.6,hz:1,lean:0,hd:0,ax:10,ay:AN.ankle,az:1,lx:-22,ly:AN.sh-ARM*0.985,lz:-5,rx:22,ry:AN.sh-ARM*0.985,rz:-5,up:0},
- crouch:{hy:34,hz:20,lean:0.42,hd:0.08,ax:13,ay:AN.ankle+2,az:4,lx:-17,ly:53,lz:-26,rx:17,ry:53,rz:-26,up:0},
- prone:{hy:12,hz:68,lean:1.54,hd:0.05,ax:13,ay:8,az:150,lx:-20,ly:4,lz:-12,rx:20,ry:4,rz:-12,up:0}
+ stand:{hy:AN.hip-0.6,hz:1,lean:0,hd:0,ax:10,ay:AN.ankle,az:1,lx:-22,ly:AN.sh-ARM*0.985,lz:-5,rx:22,ry:AN.sh-ARM*0.985,rz:-5,up:0,ft:0},
+ crouch:{hy:34,hz:20,lean:0.42,hd:0.08,ax:13,ay:AN.ankle+2,az:4,lx:-17,ly:53,lz:-26,rx:17,ry:53,rz:-26,up:0,ft:0},
+ prone:{hy:12,hz:68,lean:1.54,hd:0.05,ax:13,ay:8,az:150,lx:-20,ly:4,lz:-12,rx:20,ry:4,rz:-12,up:0,ft:0}
 };
 const CUR=Object.assign({},POSES.stand);
 const JT={};// вычисленные суставы в координатах человечка
@@ -1006,7 +1007,7 @@ function poseRig(P,neck,hands){
     const h=V3(q.sx*AN.hipW,P.hy,P.hz),a=V3(q.sx*P.ax,P.ay,P.az);
     const k=ik(h,a,AN.thigh,AN.shank,P.lean>1.2?V3(q.sx,0,-0.2):V3(q.sx*0.15,0.25,-1));
     setBone(q.th,h,k);setBone(q.sk,k,a);q.kn.position.copy(k);
-    q.foot.position.set(a.x,Math.max(2.8,a.y-4),a.z-(P.lean>1.2?-6:7));q.foot.rotation.x=P.lean>1.2?-0.5:P.up>2?-0.32:0;
+    q.foot.position.set(a.x,Math.max(2.8,a.y-4),a.z-(P.lean>1.2?-6:7));q.foot.rotation.x=P.ft>0.5?1.25:P.lean>1.2?-0.5:P.up>2?-0.32:0;if(P.ft>0.5)q.foot.position.set(a.x,a.y+6,a.z-3);
     if(P.up>2)q.foot.position.y=5.5;
   });
 }
@@ -1341,7 +1342,7 @@ function rulLabels(){
 /* ---------- Камеры и управление ---------- */
 const cap={
  d3:'Вращение: тянуть. Приближение: колесо или щипок. Сдвиг: стрелки, кнопки ниже или правая кнопка мыши. Shift+стрелки: выше или ниже. Оранжевый человечек показывает, где вы стоите в режиме «Изнутри». Клик по двери или ящику открывает его.',
- fp:'На телефоне: левая часть экрана — джойстик (тяните вверх — идти вперёд), правая — осмотреться. На компьютере щёлкните по модели, затем: W A S D — идти, левая кнопка мыши — осмотреться, клик по двери или ящику — открыть / закрыть, Shift — присесть / встать, C — лечь / встать, 1 — резать, 2 — плита, 3 — мойка, 4 — достать с полки, 5 — упереться лбом в дверь над мойкой (та же клавиша ещё раз или шаг — закончить), V — вид сбоку / из глаз; рулетка: клик — начало, клик — конец, Ctrl — строго по оси, Backspace — отменить, колесо мыши или щипок — камера дальше от головы или ближе (до вида из глаз).',
+ fp:'На телефоне: левая часть экрана — джойстик (тяните вверх — идти вперёд), правая — осмотреться. На компьютере щёлкните по модели, затем: W A S D — идти, левая кнопка мыши — осмотреться, клик по двери или ящику — открыть / закрыть, Shift — присесть / встать, C — лечь / встать, 1 — резать, 2 — плита, 3 — мойка, 4 — достать с полки, 5 — упереться лбом в дверь над мойкой, 6 — диван, 7 — одежда (у 6 и 7 та же клавиша переводит на следующее место; у остальных та же клавиша ещё раз или шаг — закончить), V — вид сбоку / из глаз; рулетка: клик — начало, клик — конец, Ctrl — строго по оси, Backspace — отменить, колесо мыши или щипок — камера дальше от головы или ближе (до вида из глаз).',
  l:'Кухня, левая стена, окно справа.',r:'Кухня, правая стена, окно слева.',w:'Кухня, стена с окном, вид от входа.'};
 const pc=new THREE.PerspectiveCamera(32,W0/H0,5,8000);
 const fc=new THREE.PerspectiveCamera(75,W0/H0,1,8000);
@@ -1379,6 +1380,7 @@ function draw(){
   if(!work)byaw=yaw;
   MAN_G.position.set(E.x,0,E.z);MAN_G.rotation.y=-byaw;
   rigUpdate();
+  G.SG.visible=!!work&&work.k==='sofa'&&tpd>5;
   MAN_G.visible=mode==='d3'||mode==='fp';MAN_HEAD.forEach(m=>m.visible=!fpe);
   wkbar.style.display=mode==='fp'?'flex':'none';wkp.style.display=work&&house3()?'block':'none';
   if(mode==='d3'){
@@ -1389,7 +1391,7 @@ function draw(){
   if(mode==='fp'){
     const d=lookDir();fc.up.set(0,1,0);
     if(tpd>5&&work){
-      const ty=112;fc.position.set(E.x-d.x*tpd,clamp(ty-d.y*tpd,8,CEIL-8),E.z-d.z*tpd);fc.lookAt(E.x,ty,E.z);
+      const ty=work.k==='sofa'?75:work.k==='hang'?135:112;fc.position.set(E.x-d.x*tpd,clamp(ty-d.y*tpd,8,CEIL-8),E.z-d.z*tpd);fc.lookAt(E.x,ty,E.z);
     }else if(tpd>5){
       const fh=new THREE.Vector3(Math.sin(yaw),0,-Math.cos(yaw));
       fc.position.set(E.x-fh.x*tpd,E.y+10+tpd*0.2,E.z-fh.z*tpd);
@@ -1481,7 +1483,7 @@ cv.addEventListener('keydown',e=>{
     if(['KeyW','KeyA','KeyS','KeyD','ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(c)){keys.add(c);kick();}
     else if(c==='ShiftLeft'||c==='ShiftRight'){if(!e.repeat)setStance('crouch');}
     else if(c==='KeyC'){if(!e.repeat)setStance('prone');}
-    else if(/^(Digit|Numpad)[1-5]$/.test(c)){if(!e.repeat)toggleWork(WKT[+c.slice(-1)-1].k);}
+    else if(/^(Digit|Numpad)[1-7]$/.test(c)){if(!e.repeat)toggleWork(WKT[+c.slice(-1)-1].k);}
     else if(c==='KeyV'){if(!e.repeat)toggleSide();}
     else used=false;
     if(used)e.preventDefault();return;
@@ -1510,7 +1512,7 @@ function hold(t,go,cls){
 const upB=hold('⇧ выше',()=>pan(0,0,12),'d3'),dnB=hold('⇩ ниже',()=>pan(0,0,-12),'d3');
 [['↑ смотреть вверх',0.08],['↓ смотреть вниз',-0.08]].forEach(([t,dp])=>hold(t,()=>{if(mode==='fp')pitch=clamp(pitch+dp,-1.55,1.55);else ph=ph-dp;draw();}));
 function btn(t,f,k){const b=document.createElement('button');b.textContent=t;b.onclick=f;if(k)b.dataset.k=k;pad.appendChild(b);return b;}
-btn('Вид из глаз',()=>{tpd=0;if(work){yaw=byaw;pitch=workDef().p;}wkSync();draw();},'fp');
+btn('Вид из глаз',()=>{tpd=0;if(work){if(work.i!==undefined)aimSpot();else{yaw=byaw;pitch=workDef().p;}}wkSync();draw();},'fp');
 const crB=btn('Присесть (Shift)',()=>setStance('crouch'),'fp');
 const prB=btn('Лечь (C)',()=>setStance('prone'),'fp');
 btn('Лечь на пол и смотреть вверх',()=>{if(mode!=='fp')setView('fp');stopWork();stance='prone';snapPose();pitch=1.3;syncPad();draw();});
@@ -1543,7 +1545,9 @@ const WKT=[
  {k:'cook',t:'🍳 Плита (2)',h:'🍳 Готовка на плите',what:'Варочная панель',rec:[20,25],maxEl:125,p:-0.8},
  {k:'sink',t:'🧽 Мойка (3)',h:'🧽 Мытьё посуды',what:'Край мойки',rec:[5,10],maxEl:160,p:-1.0},
  {k:'reach',t:'🙋 С полки (4)',h:'🙋 Достать с полки',p:0.15},
- {k:'touch',t:'🙂 Лбом к двери (5)',h:'🙂 Лбом в край двери',p:-1.1}
+ {k:'touch',t:'🙂 Лбом к двери (5)',h:'🙂 Лбом в край двери',p:-1.1},
+ {k:'sofa',t:'🛋 Диван (6)',h:'🛋 Вид на телевизор',p:0.05},
+ {k:'hang',t:'👕 Одежда (7)',h:'👕 Повесить одежду',p:0.3}
 ];
 const GAPB=2,SO=AN.front+GAPB;// от оси тела до кромки
 const HOBY=WT+0.6,BOWL=WT-22,GRIP=AN.ua+AN.fa+AN.palm,SHUP=4,TIP=8;
@@ -1552,7 +1556,7 @@ const wkbar=document.getElementById('wkbar'),wkp=document.getElementById('wkp');
 const house3=()=>mode==='d3'||mode==='fp';
 function inMan(o){while(o){if(o===MAN_G)return true;o=o.parent;}return false;}
 const WKG=new THREE.Group();MAN_G.add(WKG);WKG.visible=false;
-const PROP={cut:new THREE.Group(),cook:new THREE.Group(),sink:new THREE.Group(),reach:new THREE.Group()};
+const PROP={cut:new THREE.Group(),cook:new THREE.Group(),sink:new THREE.Group(),reach:new THREE.Group(),sofa:new THREE.Group(),hang:new THREE.Group()};
 Object.values(PROP).forEach(g=>WKG.add(g));
 const pm=(c,o)=>new THREE.MeshLambertMaterial({color:c,transparent:o!==undefined,opacity:o===undefined?1:o});
 const pr=(g,geo,m,x,y,z)=>{const q=mk(geo,m,g);q.position.set(x,y,z);return q;};
@@ -1569,6 +1573,11 @@ const spoon=bone(0.7,0.7,pm(0xB98A5E));PROP.cook.add(spoon);
 const plate=pr(PROP.sink,new THREE.CylinderGeometry(11,8,1.6,28),pm(0xF1EFE8),0,0,0);
 const sponge=pr(PROP.sink,new THREE.BoxGeometry(8,3,5),pm(0xFFD34D),0,0,0);
 const cup=pr(PROP.reach,new THREE.CylinderGeometry(4,3.4,9,20),pm(0x378ADD),0,0,0);
+// вешалка 45 см с рубашкой: начало координат — точка хвата под крючком
+(()=>{const g=PROP.hang,c=pm(0x5B86B8);const t=pr(g,new THREE.TorusGeometry(2,0.35,8,18,Math.PI*1.4),pm(0x9A9A9A),0,4,0);t.rotation.y=Math.PI/2;
+ [-1,1].forEach(q=>{const m=pr(g,new THREE.CylinderGeometry(1,1,24,10),pm(0xB98A5E),0,-5.5,q*11);m.rotation.x=-q*1.2;});
+ pr(g,new THREE.BoxGeometry(3.5,62,42),c,0,-41,0);[-1,1].forEach(q=>{const m=pr(g,new THREE.BoxGeometry(3,48,9),c,0,-34,q*23);m.rotation.x=-q*0.12;});})();
+G.SG=new THREE.Group();scene.add(G.SG);G.SG.visible=false;
 const zoneM=new THREE.MeshBasicMaterial({color:0x1D9E75,transparent:true,opacity:0.3,depthWrite:false});
 const zone=mk(new THREE.BoxGeometry(1,1,1),zoneM,MAN_G);zone.visible=false;
 
@@ -1624,9 +1633,58 @@ function touchLean(so,face,bot){
     if(best)return{g,du:best.du,eye:H.eye.y};}
   return null;
 }
+/* Диван: три места; hx — таз от спинки дивана, long — ноги вытянуты на оттоманку */
+function sofaSpots(){
+  const {xb,zs}=SOFA,U=SOFA.type==='U',z0=U?zs:zs,L=U?320:SOFA.len;
+  return [['слева',z0+57,U],['по центру',z0+L/2,false],['справа',z0+L-57,U]].map(([n,z,long])=>({n,z,long,x:xb+(long?46:58)}));
+}
+const SEAT=45;// сиденье 49 минус просадка подушки
+function sofaPose(q){return q.long?clone(POSES.stand,{hy:SEAT+9,hz:0,lean:-0.2,hd:0,ax:8,ay:SEAT+6,az:-82,lx:-17,ly:SEAT+16,lz:-28,rx:17,ry:SEAT+16,rz:-28,ft:1})
+  :clone(POSES.stand,{hy:SEAT+9,hz:0,lean:-0.32,hd:0,ax:11,az:-48,lx:-16,ly:SEAT+17,lz:-24,rx:16,ry:SEAT+17,rz:-24});}
+function tvView(q){
+  const H=headAt(sofaPose(q),0).eye,e={x:q.x-H.z,y:H.y,z:q.z},d=tvDims(TVS.diag),sx=626-d.t,dx=sx-e.x;
+  const c=new THREE.Vector3(sx,TVS.yc,TVS.zc),ev=new THREE.Vector3(e.x,e.y,e.z),A=new THREE.Vector3(sx,TVS.yc,TVS.zc-d.w/2).sub(ev),B=new THREE.Vector3(sx,TVS.yc,TVS.zc+d.w/2).sub(ev),g=180/Math.PI;
+  return{e:ev,c,d,dist:c.distanceTo(ev),ang:A.angleTo(B)*g,off:Math.abs(Math.atan2(TVS.zc-e.z,dx))*g,vc:Math.atan2(TVS.yc-e.y,Math.hypot(dx,TVS.zc-e.z))*g,vt:Math.atan2(TVS.yc+d.h/2-e.y,Math.hypot(dx,TVS.zc-e.z))*g};
+}
+/* Одежда: rod — высота штанги, D — от оси тела до штанги, back — от штанги до задней стенки, low — верх полки снизу, sh — полка сверху [высота, от тела до кромки, глубина] */
+const HSP=[
+ {n:'№42, секция ближе к двери',x:500,z:62.8,inn:[0,1],rod:188,D:38,back:25,low:61.6,sh:[202,22,41],sv:[2.214,80]},
+ {n:'№42, секция у щитков',x:558,z:62.8,inn:[0,1],rod:188,D:38,back:25,low:61.6,sh:[202,22,41],sv:[2.214,85]},
+ {n:'№43, восточная стена',x:567,z:45,inn:[1,0],rod:188,D:38,back:25,low:61.6,sh:[202,21,42],sv:[2.1,62]},
+ {n:'№45, крючки в прихожей',x:324,z:109,inn:[-1,0],rod:173,D:47,hook:1,low:50,sh:[193,29,25],sv:[-0.306,115]}
+];
+// Вытянутость руки (1 — до предела) для хвата на высоте h; лучший наклон до 10°
+function armNeed(D,h,tip){let best={r:9,g:0};
+  for(let g=0;g<=10;g++){const s=shoulderAt(leanPose(g*Math.PI/180,{up:tip?TIP:0}),1),r=Math.hypot(h-s.y-SHUP,D+s.z)/GRIP;if(r<best.r-1e-6)best={r,g};}
+  return best;}
+function rodMax(D,k,tip){let h=120;while(armNeed(D,h+2.5,tip).r<=k&&h<260)h+=0.5;return h;}
+function startSpot(k,i){
+  if(mode!=='fp')setView('fp');
+  if(work&&work.k==='cook'&&G.HOODM)G.HOODM.userData.mov.target=0;
+  stance='stand';let T;
+  if(k==='sofa'){const q=sofaSpots()[i];T={e:{n:'место '+q.n,inn:[1,0],y:0,sv:[2.29,250]},p:{x:q.x,z:q.z},so:0,q};}
+  else{const q=HSP[i];T={e:{n:q.n,inn:q.inn,y:0,sv:q.sv},p:{x:q.x,z:q.z},so:q.D,q};}
+  work={k,b:k,T,t:0,i};byaw=Math.atan2(T.e.inn[0],-T.e.inn[1]);
+  if(Math.hypot(T.p.x-E.x,T.p.z-E.z)>150||k==='hang'){E.x=T.p.x;E.z=T.p.z;}
+  if(k==='hang'){const q=T.q,h=q.rod+2;work.need=armNeed(q.D,h);work.tip=work.need.r>1;if(work.tip)work.needT=armNeed(q.D,h,true);}
+  if(k==='sofa'){
+    work.v=tvView(T.q);while(G.SG.children.length){const c=G.SG.children[0];c.geometry.dispose();G.SG.remove(c);}
+    const v=work.v,add=(p,o)=>{const l=new THREE.Line(new THREE.BufferGeometry().setFromPoints([v.e,p]),new THREE.LineBasicMaterial({color:0x1D9E75,transparent:true,opacity:o}));G.SG.add(l);};
+    add(v.c,1);[[-1,-1],[-1,1],[1,-1],[1,1]].forEach(([a,b])=>add(new THREE.Vector3(v.c.x,v.c.y+a*v.d.h/2,v.c.z+b*v.d.w/2),0.55));
+  }
+  if(tpd>5)sideView();else aimSpot();
+  Object.keys(PROP).forEach(g=>PROP[g].visible=g===k);WKG.visible=true;WKG.position.set(0,0,0);zone.visible=false;
+  wkPanel();wkSync();syncPad();kick();
+}
+// взгляд из глаз: на экран или на штангу
+function aimSpot(){yaw=byaw;pitch=workDef().p;
+  if(work.k==='sofa'){const v=work.v;yaw=Math.atan2(v.c.x-v.e.x,-(v.c.z-v.e.z));pitch=v.vc*Math.PI/180;}
+  if(work.k==='hang')pitch=Math.atan2(work.T.q.rod-165,work.T.q.D);}
 function surfY(){return work.k==='cook'?HOBY:work.T.e.y;}
 function toggleWork(k){
-  if(work&&work.k===k){stopWork();draw();return;}
+  if(work&&work.k===k){const n=k==='sofa'?3:k==='hang'?HSP.length:0;if(n&&work.i<n-1){startSpot(k,work.i+1);return;}stopWork();draw();return;}
+  if(k==='sofa'||k==='hang'){startSpot(k,0);return;}
+  if(work&&work.k==='sofa')stopWork();
   if(mode!=='fp')setView('fp');
   const b=k==='touch'?'sink':k,T=pickEdge(b);stance='stand';
   work={k,b,T,t:0};const D=workDef();
@@ -1648,11 +1706,12 @@ function stopWork(){
   if(!work)return;
   if(tpd>5)yaw=byaw;
   if(work.k==='cook'&&G.HOODM)G.HOODM.userData.mov.target=0;
+  if(work.k==='sofa'){E.x=SOFA.xb+195;}// встаёт с дивана перед ним
   work=null;WKG.visible=false;zone.visible=false;wkSync();kick();
 }
-function sideView(){if(!work){tpd=tpd||160;return;}yaw=work.T.e.sv[0];tpd=work.T.e.sv[1];pitch=-0.06;}
+function sideView(){if(!work){tpd=tpd||160;return;}yaw=work.T.e.sv[0];tpd=work.T.e.sv[1];pitch=work.k==='sofa'?-0.22:-0.06;}
 function toggleSide(){
-  if(tpd>5){tpd=0;if(work){yaw=byaw;pitch=workDef().p;}}else sideView();
+  if(tpd>5){tpd=0;if(work){if(work.i!==undefined)aimSpot();else{yaw=byaw;pitch=workDef().p;}}}else sideView();
   wkSync();draw();
 }
 function stepWork(dt){
@@ -1663,6 +1722,14 @@ function stepWork(dt){
 function targetPose(){
   if(!work)return POSES[stance];
   const T=work.T;
+  if(work.k==='sofa')return sofaPose(T.q);
+  if(work.k==='hang'){
+    // взять с уровня груди, поднять крючок над штангой, опустить; потом снять обратно
+    const q=T.q,u=(Math.max(0,work.t)%5)/5,e=u<0.35?easeIO(u/0.35):u<0.6?1:u<0.95?1-easeIO((u-0.6)/0.35):0,dip=u>0.42&&u<0.54?-4:0;
+    const n=work.tip?work.needT:work.need,P=leanPose(n.g*Math.PI/180*e,{up:work.tip?TIP*e:0});
+    const gy=116+(q.rod+2-116)*e+dip,gf=26+(q.D-26)*e;
+    P.rx=9;P.ry=gy-AN.palm*0.75;P.rz=-gf+AN.palm*0.66;P.up+=SHUP*0.6*e;return P;
+  }
   if(work.k==='reach'){
     const L=work.lv,i=Math.floor(Math.max(0,work.t)/2.6)%L.length,v=L[i],tip=v.f.dep<4,r=tip?v.u:v.f;
     const P=leanPose(r.g*Math.PI/180,{up:tip?TIP:0});
@@ -1677,7 +1744,7 @@ function targetPose(){
   return leanPose(work.lean*Math.PI/180,{lx:l.x,ly:l.y,lz:l.z,rx:r.x,ry:r.y,rz:r.z});
 }
 function stepPose(dt){
-  const P=targetPose(),k=1-Math.exp(-dt*(work&&work.k!=='reach'?16:8));let mx=0;
+  const P=targetPose(),k=1-Math.exp(-dt*(work&&work.k!=='reach'&&work.k!=='sofa'?16:8));let mx=0;
   Object.keys(P).forEach(q=>{const d=P[q]-CUR[q],u=(q==='lean'||q==='hd')?60:1;mx=Math.max(mx,Math.abs(d)*u);CUR[q]+=d*k;});
   if(mx<0.15){Object.assign(CUR,P);return false;}
   return true;
@@ -1687,12 +1754,12 @@ function rigUpdate(){
   // голова поворачивается вслед за взглядом, глаза смещаются вместе с ней
   let neck=0;
   if(stance!=='prone'){
-    if(work&&(tpd>5||work.k==='touch'))neck=work.k==='reach'?-0.35:0.6;
+    if(work&&(tpd>5||work.k==='touch'))neck=({reach:-0.35,hang:-0.3,sofa:0})[work.k]??0.6;
     else if(mode==='fp')neck=clamp(-pitch,-0.6,0.9)*0.6;
     neck-=Math.max(0,CUR.lean)*(work?0.4:0.5);
   }
-  const h=work&&work.k!=='reach'?workHands(work.k,work.t):null;
-  poseRig(CUR,neck,work?(h?[h.hl,h.hr]:[null,V3(0,0.15,-1)]):null);
+  const h=work&&['cut','cook','sink','touch'].includes(work.k)?workHands(work.k,work.t):null;
+  poseRig(CUR,neck,!work||work.k==='sofa'?null:h?[h.hl,h.hr]:[null,work.k==='hang'?V3(0,0.75,-0.66):V3(0,0.15,-1)]);
   E.y=JT.eye.y;
   if(!work)return;
   const off=WKG.position,R=JT.R.palm.clone().sub(off),L=JT.L.palm.clone().sub(off);
@@ -1700,18 +1767,41 @@ function rigUpdate(){
   if(work.k==='cook')setBone(spoon,R.clone().add(V3(0,3,0)),V3(R.x*0.7,4,-20+(R.z+20)*0.5));
   if(work.b==='sink'){plate.position.set(L.x+9,L.y-2,L.z-2);plate.rotation.set(0.5,0,-0.25);sponge.position.set(R.x,R.y-1,R.z);sponge.rotation.set(0.5,0,-0.2);}
   if(work.k==='reach')cup.position.set(R.x,R.y+1,R.z);
+  if(work.k==='hang')PROP.hang.position.set(R.x,R.y,R.z);
   const D=workDef();
   zone.visible=!!D.rec&&tpd>5;
   if(D.rec){zone.scale.set(44,D.rec[1]-D.rec[0],26);zone.position.set(0,AN.elbow-(D.rec[0]+D.rec[1])/2,-work.T.so-13);}
 }
 function wkPanel(){
   if(!work)return;const D=workDef(),T=work.T,f=Math.round,H=[];
-  H.push('<div class="t">'+D.h+'</div><div class="m">'+(work.k==='cook'?'варочная панель №2':work.b==='sink'?'мойка №13':T.e.n+(work.k==='reach'?', '+T.seg[5]:''))+' · рост '+BODY+' см, глаза '+f(AN.eye)+' см</div>');
+  H.push('<div class="t">'+D.h+'</div><div class="m">'+(work.k==='cook'?'варочная панель №2':work.b==='sink'?'мойка №13':T.e.n+(work.k==='reach'?', '+T.seg[5]:''))+' · рост '+BODY+' см'+(work.k==='sofa'?'':', глаза '+f(AN.eye)+' см')+'</div>');
   if(work.k==='touch'){
     const c=work.tc;H.push('<div>Низ двери <b>'+T.seg[3]+' см</b>, до столешницы '+f(T.seg[3]-T.e.y)+' см</div>');
     if(c){const ok=c.du>=2.5&&c.du<=7&&c.eye<T.seg[3];
       H.push('<div>Наклон корпуса <b>'+c.g+'°</b>, глаза на '+f(c.eye)+' см</div><div>Край двери на <b>'+(Math.round(c.du*10)/10+'').replace('.',',')+' см</b> выше глаз: <span class="v '+(ok?'ok':'mid')+'">'+(ok?'упор в лоб, глаза под дверью':c.du<2.5?'упор в брови':'упор в волосы')+'</span></div>');
     }else H.push('<div>Лоб до двери не достаёт</div>');
+  }else if(work.k==='sofa'){
+    const v=work.v,dg=TVS.diag*2.54,W=v.d.w,a=v.ang,q=a>50?['bad','слишком близко']:a>41.5?['mid','близко, как в кинозале']:a>=28?['ok','комфортно']:['mid','далековато'];
+    const dd=g=>f(W/2/Math.tan(g/2*Math.PI/180));
+    H.push('<div>Место '+(work.i+1)+' из 3'+(T.q.long?', ноги на оттоманке':'')+'. ТВ '+TVS.diag+'"</div>');
+    H.push('<div>От глаз до экрана <b>'+f(v.dist)+' см</b> ('+(v.dist/dg).toFixed(2).replace('.',',')+' диагонали)</div>');
+    H.push('<div>Экран занимает <b>'+f(a)+'°</b> по ширине: <span class="v '+q[0]+'">'+q[1]+'</span></div>');
+    H.push('<div class="m">Ориентир 30–40°: для этого ТВ от '+dd(40)+' до '+dd(30)+' см</div>');
+    H.push('<div>Глаза <b>'+f(v.e.y)+' см</b>, центр экрана '+f(TVS.yc)+' см: взгляд '+(v.vc>=0?'вверх на ':'вниз на ')+f(Math.abs(v.vc))+'°, к верхнему краю '+f(v.vt)+'° <span class="v '+(v.vc<=10?'ok':v.vc<=15?'mid':'bad')+'">'+(v.vc<=10?'шея в покое':v.vc<=15?'терпимо':'высоко')+'</span></div>');
+    H.push('<div>Сбоку от центра экрана на <b>'+f(v.off)+'°</b> <span class="v '+(v.off<=20?'ok':v.off<=30?'mid':'bad')+'">'+(v.off<=20?'хорошо':v.off<=30?'терпимо':'сбоку')+'</span></div>');
+    H.push('<div class="m">Клавиша 6 ещё раз — следующее место</div>');
+  }else if(work.k==='hang'){
+    const q=T.q,r=work.need.r,vd=r<=0.9?['ok','удобно']:r<=1?['mid','рука почти прямая']:work.needT.r<=1?['mid','только на носочках']:['bad','не достать'];
+    H.push('<div>Место '+(work.i+1)+' из '+HSP.length+'. '+(q.hook?'Крючок':'Штанга')+' <b>'+q.rod+' см</b>: <span class="v '+vd[0]+'">'+vd[1]+'</span></div>');
+    H.push('<div class="m">рука вытянута на '+Math.min(100,f(r*100))+'% (до 90% удобно)</div>');
+    H.push('<div>Удобно до <b>'+f(rodMax(q.D,0.9))+' см</b>, предел '+f(rodMax(q.D,1))+', на носочках '+f(rodMax(q.D,1,true))+'</div>');
+    if(!q.hook){const L=f(q.rod-q.low);
+      H.push('<div>Под одежду до нижней полки <b>'+L+' см</b></div>');
+      H.push('<div>От штанги до задней стенки <b>'+f(q.back)+' см</b>: <span class="v '+(q.back>=24?'ok':'bad')+'">'+(q.back>=28?'хватает':q.back>=24?'вешалка 45 см проходит':'вешалка 45 см упрётся')+'</span></div>');
+    }else H.push('<div>От скамьи до крючка <b>'+f(q.rod-q.low)+' см</b>, до полки над ним '+f(190-q.rod)+' см</div>');if(q.hook)H.push('<div>Тянуться через скамью: до крючка '+f(q.D-AN.front)+' см от тела</div>');
+    const A=reachCalc(q.sh[1],0,q.sh[0],false),B=reachCalc(q.sh[1],0,q.sh[0],true),cl=x=>clamp(f(x.dep),0,q.sh[2]);
+    H.push('<div class="m">Полка сверху '+q.sh[0]+' см: вглубь '+cl(A)+' из '+q.sh[2]+', на носочках '+cl(B)+'</div>');
+    H.push('<div class="m">Клавиша 7 ещё раз — следующее место</div>');
   }else if(work.k==='reach'){
     H.push('<div>Хват у переднего края: <b>'+f(work.max[0])+' см</b>, на носочках <b>'+f(work.max[1])+' см</b></div>');
     work.lv.forEach(v=>{const dp=T.seg[6],a=clamp(f(v.f.dep),0,dp),b=clamp(f(v.u.dep),0,dp);
@@ -1869,7 +1959,7 @@ epText();
 const sfx=document.getElementById('sfx'),sfz=document.getElementById('sfz'),sfi=document.getElementById('sfi');
 function sofaInfo(){
   const {xb,zs,dep,side}=SOFA,len=SOFA.type==='U'?320:SOFA.len,chL=SOFA.type==='U'?180:SOFA.chL,ze=zs+len;
-  const eye=xb+25,dist=Math.round(620-eye),dg=TVS.diag*2.54;
+  const eye=xb+50,dist=Math.round(620-eye),dg=TVS.diag*2.54;
   const pass=Math.round(xb-40);
   const chZ0=side==='S'?ze-100:zs,chZ1=chZ0+100;
   const dd=(hx,hz,px,pz)=>Math.hypot(px-hx,pz-hz);
