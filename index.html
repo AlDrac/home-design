@@ -36,7 +36,7 @@ h1{font-size:20px;font-weight:500;margin:0 0 4px}
 .vlb,.vla{position:absolute;transform:translate(-50%,-100%);font-size:10.5px;font-weight:500;border-radius:4px;padding:1px 5px;white-space:nowrap;pointer-events:none}
 .vlb{color:#0C447C;background:rgba(230,241,251,.92);border:1px solid #85B7EB}
 .vla{color:#633806;background:rgba(250,238,218,.92);border:1px solid #EF9F27}
-#venb{top:48px;left:8px}#tvb{top:48px;left:150px}#tvs{top:88px;left:8px;display:none}#xmb{top:48px;left:300px}#elb{top:88px;left:150px}
+#venb{top:48px;left:8px}#tvb{top:48px;left:150px}#tvs{top:88px;left:320px;display:none}#kcb{top:88px;left:8px}#xmb{top:48px;left:300px}#elb{top:88px;left:150px}
 .els,.ela{position:absolute;transform:translate(-50%,-100%);font-size:10.5px;font-weight:500;border-radius:4px;padding:1px 5px;white-space:nowrap;pointer-events:none;color:#7A1140;background:rgba(253,232,241,.94);border:1px solid #D6336C}
 .ela{transform:translate(-50%,-50%);padding:0 4px;color:#3A3A38;background:rgba(255,255,255,.9);border-color:#B4B2A9}
 #wkbar{position:absolute;left:50%;bottom:10px;transform:translateX(-50%);display:none;gap:6px;flex-wrap:wrap;justify-content:center;z-index:5;width:max-content;max-width:calc(100% - 16px)}
@@ -63,7 +63,7 @@ h2{font-size:15px;font-weight:500;margin:14px 0 2px}
 <h1>Первый этаж — 3D модель</h1>
 <p class="sub">Кухня детально, остальные комнаты по плану KRT 4. Размеры в сантиметрах, высота потолка 248.</p>
 <div class="vb" id="vb"></div>
-<div id="wrap"><div id="cv" tabindex="0"></div><div id="ov"></div><div id="joy"><div id="joyk"></div></div><button id="engb" class="ovb">📐 Инженерный режим</button><button id="venb" class="ovb">🌀 Вентиляция</button><button id="tvb" class="ovb">📺 Видео на ТВ</button><button id="tvs" class="ovb">🔇 Звук выкл</button><button id="elb" class="ovb">🔌 Электрика и слив</button><button id="xmb" class="ovb">🎄 Рождество</button><input id="tvf" type="file" accept="video/*,image/*" style="display:none"><button id="rulb" class="ovb">📏 Рулетка</button><button id="rulc" class="ovb">🗑 Очистить</button><div id="wkp"></div><div id="wkbar"></div><button id="fsm" class="ovb">Изнутри</button><button id="fsb" class="ovb">⛶ На весь экран</button></div>
+<div id="wrap"><div id="cv" tabindex="0"></div><div id="ov"></div><div id="joy"><div id="joyk"></div></div><button id="engb" class="ovb">📐 Инженерный режим</button><button id="venb" class="ovb">🌀 Вентиляция</button><button id="tvb" class="ovb">📺 Видео на ТВ</button><button id="tvs" class="ovb">🔇 Звук выкл</button><button id="kcb" class="ovb">🎨 Кухня: графит</button><button id="elb" class="ovb">🔌 Электрика и слив</button><button id="xmb" class="ovb">🎄 Рождество</button><input id="tvf" type="file" accept="video/*,image/*" style="display:none"><button id="rulb" class="ovb">📏 Рулетка</button><button id="rulc" class="ovb">🗑 Очистить</button><div id="wkp"></div><div id="wkbar"></div><button id="fsm" class="ovb">Изнутри</button><button id="fsb" class="ovb">⛶ На весь экран</button></div>
 <div id="cap"></div>
 <div class="vb" id="pad"></div>
 <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--tx2);padding:4px 0 8px"><label for="epw">Панель у лестницы (№32), ширина:</label><input id="epw" type="range" min="40" max="220" step="1" value="160" style="flex:1;max-width:320px"><span id="epwv" style="color:var(--tx);min-width:60px">160 см</span></div>
@@ -105,10 +105,15 @@ const lineMat=new THREE.LineBasicMaterial({color:0x5F5E5A});
 const G={L:new THREE.Group(),R:new THREE.Group(),W:new THREE.Group(),T:new THREE.Group(),F:new THREE.Group(),H:new THREE.Group(),S:new THREE.Group(),C:new THREE.Group(),LD:new THREE.Group(),RD:new THREE.Group(),LG:new THREE.Group(),RG:new THREE.Group(),LL:new THREE.Group(),RL:new THREE.Group()};
 G.L.add(G.LD);G.R.add(G.RD);G.L.add(G.LG);G.R.add(G.RG);G.L.add(G.LL);G.R.add(G.RL);
 [G.L,G.R,G.W,G.T,G.F,G.H,G.S,G.C].forEach(g=>scene.add(g));
+// Цвет кухни: фасады (FR) и видимые бока (VIS) рисуются общими материалами, поэтому тема переключается сразу
+const KMAT={[0x4B4E52]:new THREE.MeshLambertMaterial({color:0x4B4E52}),[0x505357]:new THREE.MeshLambertMaterial({color:0x505357})};
+const KTHEMES=[{n:'графит',fr:0x4B4E52,vis:0x505357},{n:'крем',fr:0xF2EAD8,vis:0xB8AF9E}];
+let kTheme=0;
+function setKitchen(i){kTheme=i;KMAT[0x4B4E52].color.setHex(KTHEMES[i].fr);KMAT[0x505357].color.setHex(KTHEMES[i].vis);}
 function box(g,x,y,z,w,h,d,col,op,noEdge){
   if(col===0xB98A5E&&op===undefined)return wood(g,x,y,z,w,h,d);// поверхности в декоре столешницы
   const geo=new THREE.BoxGeometry(w,h,d);
-  const m=new THREE.MeshLambertMaterial({color:col,transparent:op!==undefined,opacity:op===undefined?1:op});
+  const m=op===undefined&&KMAT[col]||new THREE.MeshLambertMaterial({color:col,transparent:op!==undefined,opacity:op===undefined?1:op});
   const me=new THREE.Mesh(geo,m);me.position.set(x+w/2,y+h/2,z+d/2);g.add(me);
   if(!noEdge){const ln=new THREE.LineSegments(new THREE.EdgesGeometry(geo),lineMat);ln.position.copy(me.position);g.add(ln);}
   return me;
@@ -1912,6 +1917,7 @@ document.getElementById('venb').addEventListener('click',e=>{vent=!vent;e.curren
  document.getElementById('elt').innerHTML='<tr><th>№</th><th>Что</th><th>Стена / статус</th><th>По горизонтали, см</th><th>Центр от пола, см</th><th>Точек</th><th>Нагрузка</th><th>Где и как</th></tr>'+
   hd('Кухня и гостиная')+ELP.map(row).join('')+[['K','Гостиная: розетки застройщика'],['WC','WC'],['H','Прихожая'],['G','Гардероб']].map(([r,t])=>hd(t)+ELO.filter(p=>p.rm===r).map(rowO).join('')).join('');})();
 document.getElementById('elb').addEventListener('click',e=>{util=!util;e.currentTarget.classList.toggle('on',util);draw();});
+document.getElementById('kcb').addEventListener('click',e=>{setKitchen((kTheme+1)%KTHEMES.length);e.currentTarget.textContent='🎨 Кухня: '+KTHEMES[kTheme].n;draw();});
 document.getElementById('xmb').addEventListener('click',e=>{xmas=!xmas;G.XM.visible=xmas;e.currentTarget.classList.toggle('on',xmas);draw();});
 let tvVid=null,tvUrl=null;
 const tvs=document.getElementById('tvs');
